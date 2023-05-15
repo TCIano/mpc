@@ -27050,7 +27050,7 @@ screen and (-ms-high-contrast: active) {
 .dark .ant-switch:after {
   background-color: #fff;
   border-radius: 18px;
-  content: ' ';
+  /* content: ' '; */
   cursor: pointer;
   height: 18px;
   left: 1px;

@@ -2,6 +2,7 @@ import { Ref, UnwrapRef } from 'vue'
 import { RouteRecordRaw, RouteMeta } from 'vue-router'
 import CacheView from './cached-view'
 import VisitedView from './visited-view'
+import { StorageDic } from '../enum'
 
 export interface RouteMetaType extends RouteMeta {
   icon?: string
@@ -88,4 +89,23 @@ export interface StoreType extends CacheView, VisitedView {
   initPermissionRoute: (routes: Array<RouteRecordRaw>) => void
   isEmptyPermissionRoute: () => boolean
   reset: () => void
+}
+/**
+ * 本地存储
+ */
+export type Key = string
+export type Expire = StorageDic.expire | number
+export interface StorageData<T> {
+  value: T
+  [StorageDic.expire]: StorageDic.expire | number
+}
+export interface StorageResult<T> {
+  value: T | null
+  message: string
+}
+export interface StorageCls {
+  set: <T>(key: Key, value: T, expire: Expire) => void
+  get: <T = any>(key: Key) => StorageResult<T | null>
+  remove: (key: Key) => void
+  clear: () => void
 }

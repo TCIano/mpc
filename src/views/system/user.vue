@@ -60,7 +60,7 @@
         <TableFooter ref="tableFooterRef" :pagination="pagination" />
       </div>
     </a-col>
-    <ModalDialog
+    <DrawerDialog
       ref="userEditModal"
       :title="actionModal === 'add' ? '添加用户' : '编辑用户'"
       content-height="50vh"
@@ -93,7 +93,7 @@
           </a-form-item>
         </a-form>
       </template>
-    </ModalDialog>
+    </DrawerDialog>
   </a-row>
 </template>
 
@@ -108,7 +108,7 @@
     useTableColumn,
     useTableHeight,
   } from '@/hooks/table'
-  import { FormItem, ModalDialogType } from '@/types/components'
+  import { FormItem, ModalDialogType, DrawerDialogType } from '@/types/components'
   import { message, Modal } from 'ant-design-vue'
   import { defineComponent, getCurrentInstance, onMounted, ref, watch } from 'vue'
   export default defineComponent({
@@ -346,7 +346,7 @@
           align: 'center',
         }
       )
-      const userEditModal = ref<ModalDialogType>(null)
+      const userEditModal = ref<DrawerDialogType>(null)
       const expandAllFlag = ref(false)
       function doRefresh() {
         post({

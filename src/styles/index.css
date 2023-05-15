@@ -118,3 +118,13 @@ body,
   border-top: none;
   background: hsl(0, 0%, 98%);
 }
+
+.ant-drawer .ant-drawer-content .ant-drawer-header {
+  border-bottom: none;
+  background: hsl(0, 0%, 97%);
+}
+
+.ant-drawer .ant-drawer-content .ant-drawer-footer {
+  border-top: none;
+  background: hsl(0, 0%, 98%);
+}

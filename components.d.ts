@@ -58,6 +58,8 @@ declare module 'vue' {
     Chart: typeof import('./src/components/chart.vue')['default']
     DataForm: typeof import('./src/components/DataForm.vue')['default']
     DeleteButton: typeof import('./src/components/DeleteButton.vue')['default']
+    DrawDialog: typeof import('./src/components/DrawDialog.vue')['default']
+    DrawerDialog: typeof import('./src/components/DrawerDialog.vue')['default']
     IconSelector: typeof import('./src/components/IconSelector.vue')['default']
     MarkdownEditor: typeof import('./src/components/MarkdownEditor.vue')['default']
     MessageContent: typeof import('./src/components/MessageContent.vue')['default']

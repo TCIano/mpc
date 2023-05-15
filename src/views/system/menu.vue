@@ -52,7 +52,6 @@
       ref="modalDialog"
       :title="actionModel === 'add' ? '添加菜单' : '编辑菜单'"
       @confirm="onConfirm"
-      content-height="50vh"
     >
       <template #content>
         <a-form :wrapperCol="{ span: 18 }">

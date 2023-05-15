@@ -62,7 +62,11 @@ export interface TablePropsType {
 export type ModalDialogType = InstanceType<
   typeof import('../components/common/ModalDialog.vue').default
 >
+export type DrawerDialogType = InstanceType<
+  typeof import('../components/common/DrawerDialogType.vue').default
+>
 
+// export type DrawerDialogType = InstanceType<
 export type DataFormType = InstanceType<typeof import('../components/DataForm.vue').default>
 
 export type TableHeaderType = InstanceType<
