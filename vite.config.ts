@@ -1,0 +1,61 @@
+import vue from '@vitejs/plugin-vue'
+import viteSvgIcons from 'vite-plugin-svg-icons'
+import Components from 'unplugin-vue-components/vite'
+import OptimizationPersist from 'vite-plugin-optimize-persist'
+import PkgConfig from 'vite-plugin-package-config'
+import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
+import path from 'path'
+import { ConfigEnv, defineConfig } from 'vite'
+import dotenv from 'dotenv'
+import vueSetupExtend from 'vite-plugin-vue-setup-extend'
+
+export default ({ mode }) => {
+  const dotenvConfig = dotenv.config({ path: `./.env.${mode}` })
+  const dotenvObj = dotenvConfig.parsed
+  return defineConfig({
+    base: dotenvObj?.BUILD_PATH,
+    build: {
+      outDir: dotenvObj?.BUILD_OUT_DIR || 'dist',
+    },
+    plugins: [
+      vue(),
+      Components({
+        resolvers: [AntDesignVueResolver()],
+      }),
+      viteSvgIcons({
+        iconDirs: [path.resolve(process.cwd(), 'src/icons')],
+        symbolId: 'icon-[dir]-[name]',
+      } as any),
+      PkgConfig(),
+      OptimizationPersist(),
+      vueSetupExtend(),
+    ] as any,
+    css: {
+      preprocessorOptions: {
+        less: {
+          additionalData: `@import "src/styles/variables.less";`,
+          modifyVars: {},
+          javascriptEnabled: true,
+        },
+      },
+      postcss: {
+        plugins: [require('tailwindcss'), require('autoprefixer')],
+      },
+    },
+    resolve: {
+      alias: [
+        {
+          find: '@/',
+          replacement: path.resolve(process.cwd(), 'src') + '/',
+        },
+      ],
+    },
+    server: {
+      open: true,
+    },
+    optimizeDeps: {
+      include: [],
+      exclude: ['vue-demi'],
+    },
+  })
+}
