@@ -18,7 +18,10 @@
             @click="itemClick(item.fullPath, $event)"
             @contextmenu="onContextMenu(item.fullPath, $event)"
           >
-            <span>
+            <span v-if="item.meta?.title === '内嵌页面'">
+              {{ item.query?.title || item.meta.title }}</span
+            >
+            <span v-else>
               {{ item.meta ? item.meta.title : item.name
               }}{{ item.query?.title ? ' - ' + item.query?.title : '' }}
             </span>

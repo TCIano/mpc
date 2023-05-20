@@ -10,7 +10,7 @@
   >
     <template v-for="item of menuOptions" :key="item.key">
       <template v-if="!item.children">
-        <a-menu-item :key="item.key">
+        <a-menu-item :key="item.key" :title="item.label">
           <template #icon>
             <component :is="item.icon || 'MenuOutlined'" />
           </template>
@@ -99,15 +99,17 @@
           defaultExpandKeys.value = pathList
         }
       }
-      function onMenuClick({ key, component }: any) {
+      function onMenuClick({ key, item }: any) {
         if (isExternal(key)) {
           window.open(key)
         } else {
-          if (!component)
+          let isIframe = router.getRoutes().find((item) => item.path === key)?.components
+          if (!isIframe)
             return router.push({
               path: '/iframe',
               query: {
                 url: key,
+                title: item.title,
               },
             })
           router.push(key)
