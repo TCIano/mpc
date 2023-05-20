@@ -3,7 +3,7 @@
     <div class="logo-wrapper">
       <Logo :always-show="true" :showTitle="false" />
     </div>
-    <div class="menu-wrapper">
+    <div class="menu-wrapper" v-if="state.layoutMode === 'ttb'">
       <ScrollerMenu mode="horizontal" :routes="routes" />
     </div>
     <div class="right-wrapper">
@@ -45,6 +45,7 @@
     right: 0;
     z-index: 999;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
     border-bottom: 1px solid var(--border-color);

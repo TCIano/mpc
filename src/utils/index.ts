@@ -115,6 +115,7 @@ interface MenuOption {
   label: string | undefined
   icon: string | undefined
   children: Array<MenuOption> | null
+  component: any
 }
 
 export function transfromMenu(originRoutes: Array<RouteRecordRawWithHidden>): Array<MenuOption> {
@@ -130,6 +131,7 @@ export function transfromMenu(originRoutes: Array<RouteRecordRawWithHidden>): Ar
         label: it.meta?.title as string,
         icon: it.meta?.icon as string,
         children: null,
+        component: it.component,
       }
       if (it.children) {
         if (it.meta && it.meta.isSingle && it.children.length === 1) {

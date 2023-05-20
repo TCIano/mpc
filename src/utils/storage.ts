@@ -1,19 +1,18 @@
-import { number } from 'echarts/core'
 import { StorageDic } from '../enum'
 import { StorageCls, StorageData, StorageResult, Key, Expire } from '../types/store'
 //本地存储
-class useStorage implements StorageCls {
-  public set<T>(key: Key, value: T, expire: Expire) {
+class useLocalStorage implements StorageCls {
+  public set<T>(key: Key, value: T, expire: Expire = StorageDic.permanent) {
     const data = {
       value,
       [StorageDic.expire]: expire,
     }
     localStorage.setItem(key, JSON.stringify(data))
   }
-  public get<T>(key: Key): StorageResult<T | null> {
+  public get<T>(key: Key): StorageResult<T> {
     const value = localStorage.getItem(key)
     if (value) {
-      const obj = JSON.parse(value)
+      const obj: StorageData<T> = JSON.parse(value)
       const now = new Date().getTime()
       if (typeof obj[StorageDic.expire] === 'number' && obj[StorageDic.expire] < now) {
         this.remove(key)
@@ -43,4 +42,4 @@ class useStorage implements StorageCls {
   }
 }
 
-export { useStorage }
+export { useLocalStorage }

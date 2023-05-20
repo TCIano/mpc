@@ -67,12 +67,19 @@
     })
   }
   const openScript = (title: string) => {
-    router.push({
+    // router.push({
+    //   path: '/script',
+    //   query: {
+    //     title,
+    //   },
+    // })
+    let routeUrl = router.resolve({
       path: '/script',
       query: {
         title,
       },
     })
+    window.open(routeUrl.href, '_blank')
   }
   const openPerformance = (title: string) => {
     router.push({

@@ -2,12 +2,12 @@
   <div
     class="vaw-side-bar-wrapper"
     :bordered="false"
-    :style="{ borderRadius: '0px', marginTop: state.layoutMode === 'ttb' ? '48px' : 0 }"
+    :style="{ borderRadius: '0px', marginTop: state.layoutMode !== 'lcr' ? '48px' : 0 }"
     :class="[!state.isCollapse ? 'open-status' : 'close-status', bgColor]"
   >
-    <transition name="logo">
+    <!-- <transition name="logo">
       <Logo v-if="showLogo" />
-    </transition>
+    </transition> -->
     <ScrollerMenu :routes="routes" />
     <div class="mobile-shadow"></div>
   </div>

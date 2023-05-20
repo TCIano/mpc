@@ -11,11 +11,13 @@
         <div class="h-full mt-4">
           <a-tree
             show-line
+            show-icon
             :auto-expand-parent="autoExpandParent"
             :expandedKeys="expandedKeys"
             :tree-data="tree"
             @expand="onExpand"
           >
+            <!-- <div class="flex"> -->
             <template #title="{ title, key }">
               <span v-if="title.indexOf(searchText) > -1">
                 {{ title?.substr(0, title.indexOf(searchText)) }}
@@ -24,6 +26,13 @@
               </span>
               <span v-else>{{ title }}</span>
             </template>
+            <template #icon="{ title, key }">
+              <template v-if="key === '0-0'">
+                <span class="ball"></span>
+                <!-- <up-circle-outlined /> -->
+              </template>
+            </template>
+            <!-- </div> -->
           </a-tree>
         </div>
       </a-card>
@@ -265,4 +274,14 @@
   })
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+  .ball {
+    width: 20px;
+    height: 20px;
+    display: block;
+    background: black;
+    border-radius: 50%;
+    margin: 0;
+    background: radial-gradient(circle at 100px 100px, #d0eccc, #6be7a3);
+  }
+</style>

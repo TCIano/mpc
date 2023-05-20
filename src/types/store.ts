@@ -94,7 +94,7 @@ export interface StoreType extends CacheView, VisitedView {
  * 本地存储
  */
 export type Key = string
-export type Expire = StorageDic.expire | number
+export type Expire = StorageDic.permanent | number
 export interface StorageData<T> {
   value: T
   [StorageDic.expire]: StorageDic.expire | number
@@ -105,7 +105,7 @@ export interface StorageResult<T> {
 }
 export interface StorageCls {
   set: <T>(key: Key, value: T, expire: Expire) => void
-  get: <T = any>(key: Key) => StorageResult<T | null>
+  get: <T>(key: Key) => StorageResult<T | null>
   remove: (key: Key) => void
   clear: () => void
 }

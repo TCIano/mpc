@@ -12,8 +12,9 @@
       <MainLayout />
     </template>
     <template v-else>
+      <VAWHeader />
       <SideBar />
-      <MainLayout />
+      <MainLayout :show-nav-bar="false" />
     </template>
     <div
       v-if="state.device === 'mobile'"

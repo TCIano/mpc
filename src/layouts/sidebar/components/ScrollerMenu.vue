@@ -84,6 +84,7 @@
         menuOptions.length = 0
         const tempMenus = transfromMenu(routes || [])
         menuOptions.push(...tempMenus)
+        console.log(menuOptions)
       }
       function handleExpandPath() {
         if (props.mode === 'inline') {
@@ -98,10 +99,17 @@
           defaultExpandKeys.value = pathList
         }
       }
-      function onMenuClick({ key }: any) {
+      function onMenuClick({ key, component }: any) {
         if (isExternal(key)) {
           window.open(key)
         } else {
+          if (!component)
+            return router.push({
+              path: '/iframe',
+              query: {
+                url: key,
+              },
+            })
           router.push(key)
           if (store.state.device === 'mobile') {
             store.toggleCollapse(true)

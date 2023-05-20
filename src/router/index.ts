@@ -78,16 +78,7 @@ export const constantRoutes = [
           // icon: '',
         },
       },
-      //  在线脚本
-      {
-        path: '/script',
-        name: 'script',
-        hidden: true,
-        component: () => import('@/views/personal/script.vue'),
-        meta: {
-          title: '在线脚本',
-        },
-      },
+
       //  性能评估
       {
         path: '/performance',
@@ -100,6 +91,16 @@ export const constantRoutes = [
         },
       },
     ],
+  },
+  //  在线脚本
+  {
+    path: '/script',
+    name: 'script',
+    hidden: true,
+    component: () => import('@/views/personal/script.vue'),
+    meta: {
+      title: '在线脚本',
+    },
   },
   {
     path: '/iframe',
@@ -134,8 +135,8 @@ export const constantRoutes = [
     },
     children: [
       {
-        path: 'index',
-        name: 'configCenter',
+        path: 'cfg',
+        name: 'ConfigCenter',
         component: (): any => import('@/views/cfgCenter/index.vue'),
         meta: {
           title: '配置中心',

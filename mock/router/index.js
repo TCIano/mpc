@@ -30,23 +30,28 @@ export const adminRoutes = [
         menuName: '菜单管理',
         cacheable: true,
       },
-    ],
-  },
-
-  {
-    menuUrl: '/test1',
-    menuName: '测试页面',
-    icon: 'left-circle-outlined',
-    parentPath: '',
-    isSingle: true, //必须要有此属性
-    children: [
       {
-        parentPath: '/test1',
+        parentPath: '/system',
         menuUrl: '/test1/demo', //第二个斜杠后面的路径为组件的在test文件夹下的路径
         menuName: '测试组件1',
       },
     ],
   },
+
+  // {
+  //   menuUrl: '/test1',
+  //   menuName: '测试页面',
+  //   icon: 'left-circle-outlined',
+  //   parentPath: '',
+  //   isSingle: true, //必须要有此属性
+  //   children: [
+  //     {
+  //       parentPath: '/test1',
+  //       menuUrl: '/test1/demo', //第二个斜杠后面的路径为组件的在test文件夹下的路径
+  //       menuName: '测试组件1',
+  //     },
+  //   ],
+  // },
   {
     menuUrl: '/test',
     menuName: '测试页面',
@@ -113,6 +118,19 @@ export const adminRoutes = [
         parentPath: '/excel',
         menuUrl: '/excel/export-rows-excel',
         menuName: '导出选中行',
+      },
+    ],
+  },
+  {
+    menuUrl: '/twhg',
+    menuName: '天伟化工',
+    icon: 'file-excel-outlined',
+    parentPath: '',
+    children: [
+      {
+        parentPath: '/twhg',
+        menuUrl: '/equipmentWeb/#/typeOfEquipment',
+        menuName: '设备',
       },
     ],
   },

@@ -85,7 +85,7 @@ function generatorRoutes(res: Array<OriginRoute>) {
   const tempRoutes: Array<RouteRecordRawWithHidden> = []
   res.forEach((it) => {
     const route: RouteRecordRawWithHidden | any = {
-      path: it.outLink && isExternal(it.outLink) ? it.outLink : it.menuUrl,
+      path: it.outLink && isExternal(it.outLink) ? it.outLink : it.menuUrl || '',
       name: getNameByUrl(it.menuUrl),
       hidden: !!it.hidden,
       component: isMenu(it.menuUrl) ? Layout : getComponent(it) || undefined,
@@ -102,6 +102,8 @@ function generatorRoutes(res: Array<OriginRoute>) {
     }
     tempRoutes.push(route)
   })
+  console.log(tempRoutes)
+
   return tempRoutes
 }
 
@@ -133,10 +135,9 @@ router.beforeEach(async (to) => {
         // 加载路由
         const accessRoutes: Array<RouteRecordRaw> = []
         const tempRoutes = await getRoutes()
+        console.log(tempRoutes)
         accessRoutes.push(...tempRoutes)
         const mapRoutes = mapTwoLevelRouter(accessRoutes)
-        console.log(mapRoutes)
-
         mapRoutes.forEach((it: any) => {
           router.addRoute(it)
         })
