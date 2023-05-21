@@ -110,7 +110,7 @@ export function transfromRoutes(
   return tempRoutes
 }
 
-interface MenuOption {
+export interface MenuOption {
   key: string | undefined
   label: string | undefined
   icon: string | undefined

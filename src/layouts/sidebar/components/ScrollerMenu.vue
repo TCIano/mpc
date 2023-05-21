@@ -40,6 +40,7 @@
   import { useLayoutStore } from '../../index'
   import { RouteRecordRawWithHidden } from '../../../types/store'
   import { isExternal, transfromMenu } from '../../../utils'
+  import { MenuOption } from '@/utils'
 
   export default defineComponent({
     name: 'ScrollerMenu',
@@ -72,9 +73,9 @@
       const currentRoute = useRoute()
       const router = useRouter()
       defaultPath.value.push(currentRoute.fullPath)
-      handleExpandPath()
       onMounted(() => {
         handleMenu(props.routes)
+        handleExpandPath()
       })
       /**
        * 菜单渲染
@@ -84,22 +85,49 @@
         menuOptions.length = 0
         const tempMenus = transfromMenu(routes || [])
         menuOptions.push(...tempMenus)
-        console.log(menuOptions)
+      }
+      function getAllParentNodes(tree: MenuOption[], code: string) {
+        let arr: any = [] //要返回的数组
+        for (let i = 0; i < tree.length; i++) {
+          let item = tree[i]
+          arr = []
+          arr.push(item.key) //保存当前节点id
+          if (code == item.key) {
+            //判断当前id是否是默认id
+            return arr //是则退出循环、返回数据
+          } else {
+            //否则进入下面判断，判断当前节点是否有子节点数据
+            if (item.children && item.children.length > 0) {
+              //合并子节点返回的数据
+              arr = arr.concat(getAllParentNodes(item.children, code))
+              if (arr.includes(code)) {
+                //如果当前数据中已包含默认节点，则退出循环、返回数据
+                return arr
+              }
+            }
+          }
+        }
       }
       function handleExpandPath() {
         if (props.mode === 'inline') {
-          const paths = currentRoute.fullPath.split('/')
-          const pathList = paths
-            .filter((it) => !!it)
-            .reduce((pre: Array<string>, cur: string) => {
-              const lastItem = pre[pre.length - 1] || ''
-              pre.push(lastItem + '/' + cur)
-              return pre
-            }, [])
+          console.log(currentRoute, props.routes, menuOptions)
+          const paths = currentRoute.fullPath
+          let pathList = getAllParentNodes(menuOptions, paths)
+
+          // const paths = currentRoute.fullPath.split('/')
+          // const pathList = paths
+          //   .filter((it) => !!it)
+          //   .reduce((pre: Array<string>, cur: string) => {
+          //     const lastItem = pre[pre.length - 1] || ''
+          //     pre.push(lastItem + '/' + cur)
+          //     return pre
+          //   }, [])
           defaultExpandKeys.value = pathList
         }
       }
-      function onMenuClick({ key, item }: any) {
+      function onMenuClick({ key, item, keyPath }: any) {
+        console.log(keyPath)
+
         if (isExternal(key)) {
           window.open(key)
         } else {

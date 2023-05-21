@@ -35,6 +35,24 @@ export const adminRoutes = [
         menuUrl: '/test1/demo', //第二个斜杠后面的路径为组件的在test文件夹下的路径
         menuName: '测试组件1',
       },
+      {
+        parentPath: '/system',
+        menuName: '我的',
+        menuUrl: '/wod',
+        outLink: '',
+        icon: 'AccountBookOutlined',
+        cacheable: '',
+        hidden: '',
+        affix: '',
+        // isSingle: true, //必须要有此属性
+        children: [
+          {
+            parentPath: '/wod',
+            menuUrl: '/wod/w/index', //第二个斜杠后面的路径为组件的在test文件夹下的路径
+            menuName: '我的',
+          },
+        ],
+      },
     ],
   },
 
@@ -66,24 +84,24 @@ export const adminRoutes = [
       },
     ],
   },
-  {
-    parentPath: '',
-    menuName: '我的',
-    menuUrl: '/wod',
-    outLink: '',
-    icon: 'AccountBookOutlined',
-    cacheable: '',
-    hidden: '',
-    affix: '',
-    // isSingle: true, //必须要有此属性
-    children: [
-      {
-        parentPath: '/wod',
-        menuUrl: '/wod/w/index', //第二个斜杠后面的路径为组件的在test文件夹下的路径
-        menuName: '我的',
-      },
-    ],
-  },
+  // {
+  //   parentPath: '',
+  //   menuName: '我的',
+  //   menuUrl: '/wod',
+  //   outLink: '',
+  //   icon: 'AccountBookOutlined',
+  //   cacheable: '',
+  //   hidden: '',
+  //   affix: '',
+  //   // isSingle: true, //必须要有此属性
+  //   children: [
+  //     {
+  //       parentPath: '/wod',
+  //       menuUrl: '/wod/w/index', //第二个斜杠后面的路径为组件的在test文件夹下的路径
+  //       menuName: '我的',
+  //     },
+  //   ],
+  // },
   {
     menuUrl: '/editor',
     menuName: '编辑器',

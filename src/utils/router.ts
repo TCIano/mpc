@@ -61,6 +61,7 @@ function getComponent(it: OriginRoute) {
   //   loader: asynComponents['../views' + it.menuUrl + '.vue'],
   //   loadingComponent: LoadingComponent,
   // })
+
   return asynComponents['../views' + it.menuUrl + '.vue']
 }
 
@@ -88,7 +89,7 @@ function generatorRoutes(res: Array<OriginRoute>) {
       path: it.outLink && isExternal(it.outLink) ? it.outLink : it.menuUrl || '',
       name: getNameByUrl(it.menuUrl),
       hidden: !!it.hidden,
-      component: isMenu(it.menuUrl) ? Layout : getComponent(it) || undefined,
+      component: isMenu(it.menuUrl) ? Layout : getComponent(it),
       meta: {
         title: it.menuName,
         affix: !!it.affix,

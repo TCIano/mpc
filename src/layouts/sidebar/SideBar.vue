@@ -37,7 +37,7 @@
       })
       const routes = computed(() => {
         //后面的filter可以去掉
-        return store?.state.permissionRoutes.filter((it) => !!it.name)
+        return store?.state.permissionRoutes
       })
       return {
         state: store?.state,
