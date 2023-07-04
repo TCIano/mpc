@@ -9,7 +9,18 @@
   >
     <Scrollbar>
       <div class="wrapper">
-        <a-divider dashed>主题设置</a-divider>
+        <a-divider dashed>系统基础设置</a-divider>
+        <div class="flex justify-around pb-8">
+          <span style="width: 100px">系统名称</span>
+          <a-input
+            v-model:value="state.projectName"
+            style="width: 100%"
+            size="small"
+            @pressEnter="onPrjNameUpdate"
+            @blur="onPrjNameUpdate"
+          />
+        </div>
+        <!-- <a-divider dashed>主题设置</a-divider>
         <div class="flex justify-around pb-8">
           <div v-for="(item, index) of themeList" :key="index" class="example-wrapper">
             <StyleExample
@@ -52,8 +63,8 @@
               @click="layoutExampleClick(item)"
             />
           </div>
-        </div>
-        <div style="height: 20px"></div>
+        </div> -->
+        <!-- <div style="height: 20px"></div> -->
         <a-divider dashed>菜单设置</a-divider>
         <div class="setting-item-wrapper">
           <span style="width: 100px">菜单宽度</span>
@@ -244,6 +255,9 @@
         })
         store.changeLayoutMode(item.layoutId)
       }
+      function onPrjNameUpdate(e: KeyboardEvent) {
+        store.changePrjName((e.target as HTMLInputElement).value)
+      }
       function isOpenWater(val: boolean) {
         store.changeOpenWaterMark(val)
       }
@@ -279,6 +293,7 @@
         isOpenWater,
         onShowTabbar,
         onWaterMarkChange,
+        onPrjNameUpdate,
         layoutExampleClick,
         onAnimUpdate,
         animOptions,

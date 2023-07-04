@@ -9415,20 +9415,20 @@
 }
 
 .light .ant-radio {
-  font-feature-settings: 'tnum';
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
   color: rgba(0, 0, 0, 0.85);
-  cursor: pointer;
-  display: inline-block;
   font-size: 14px;
   font-variant: tabular-nums;
   line-height: 1.5715;
   list-style: none;
-  margin: 0;
-  outline: 0;
-  padding: 0;
+  font-feature-settings: 'tnum';
   position: relative;
-  top: 0;
+  top: 0.2em;
+  display: inline-block;
+  outline: none;
+  cursor: pointer;
 }
 
 .light .ant-radio-input:focus+.ant-radio-inner,
@@ -9476,20 +9476,22 @@
 }
 
 .light .ant-radio-inner:after {
-  background-color: #1890ff;
-  border-left: 0;
-  border-radius: 8px;
-  border-top: 0;
-  content: ' ';
-  display: block;
-  height: 8px;
-  left: 3px;
-  opacity: 0;
   position: absolute;
-  top: 3px;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  margin-left: -5px;
+  background-color: #1890ff;
+  border-top: 0;
+  border-left: 0;
+  border-radius: 16px;
   transform: scale(0);
+  opacity: 0;
   transition: all 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
-  width: 8px;
+  content: ' ';
 }
 
 .light .ant-radio-input {
@@ -27415,7 +27417,7 @@ screen and (-ms-high-contrast: active) {
 }
 
 .light .ant-table-pagination.ant-pagination {
-  margin: 16px 0;
+  margin: 16px 16px 16px 0;
 }
 
 .light .ant-table-pagination {
@@ -30277,7 +30279,7 @@ screen and (-ms-high-contrast: active) {
 }
 
 .light .ant-upload-list-item-info>span {
-  display: block;
+  /* display: block; */
   height: 100%;
   width: 100%;
 }

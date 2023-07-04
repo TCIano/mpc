@@ -9,14 +9,17 @@
     @ok="onConfirm"
     @cancel="onCancel"
   >
-    <div :style="{ maxHeight: '50vh', overflow: 'auto' }">
+    <div :style="{ maxHeight: '80vh' }">
       <slot name="content"></slot>
     </div>
+    <template v-for="(value, name) in slots" #[name]="slotData">
+      <slot v-if="name !== 'content'" :name="name" v-bind="slotData"></slot>
+    </template>
   </a-modal>
 </template>
 
 <script lang="ts">
-  import { computed, defineComponent, ref } from 'vue'
+  import { computed, defineComponent, ref, useSlots } from 'vue'
   import { useLayoutStore } from '@/layouts'
 
   export default defineComponent({
@@ -30,9 +33,14 @@
         type: String,
         default: '30vh',
       },
+      width: {
+        type: String,
+        default: '',
+      },
     },
     emits: ['confirm', 'cancel'],
     setup(props, { emit }) {
+      const slots = useSlots()
       const showModal = ref(false)
       const layoutStore = useLayoutStore()
       const bodyStyle = computed(() => ({
@@ -65,6 +73,7 @@
         close,
         onConfirm,
         onCancel,
+        slots,
       }
     },
   })

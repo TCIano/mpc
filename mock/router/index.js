@@ -16,7 +16,7 @@ export const adminRoutes = [
       // },
       {
         parentPath: '/system',
-        menuUrl: '/system/user',
+        menuUrl: 'system/user',
         menuName: '岗位管理',
       },
       {
@@ -32,9 +32,16 @@ export const adminRoutes = [
       },
       {
         parentPath: '/system',
+        menuUrl: '/system/frameInfo/platformCfg',
+        menuName: '框架信息管理',
+        cacheable: false,
+      },
+      {
+        parentPath: '/system',
         menuUrl: '/test1/demo', //第二个斜杠后面的路径为组件的在test文件夹下的路径
         menuName: '测试组件1',
       },
+
       {
         parentPath: '/system',
         menuName: '我的',
@@ -44,7 +51,7 @@ export const adminRoutes = [
         cacheable: '',
         hidden: '',
         affix: '',
-        // isSingle: true, //必须要有此属性
+        isSingle: true, //必须要有此属性
         children: [
           {
             parentPath: '/wod',

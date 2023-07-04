@@ -15,6 +15,13 @@
         <Chart :styleOp="style" :series="item" />
       </a-col>
     </a-row>
+    <!-- <img
+      src="data:image/svg+xml,%3Csvg width='200' height='200'
+    xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='50%25' y='50%25' font-size='12'
+    fill='%23a2a9b6' font-family='system-ui, sans-serif' text-anchor='middle'
+    dominant-baseline='middle' transform='rotate(-45, 100 100)'
+    %3Eundefined%3C/text%3E%3C/svg%3E"
+    /> -->
   </div>
 </template>
 
@@ -37,16 +44,23 @@
   ])
   const dataChunks = ref<chartOption[]>([])
   for (let index = 0; index < 30; index++) {
-    dataList.value.push({
-      date,
-      data,
-    })
+    if (index === 10) {
+      dataList.value.push({
+        date: [],
+        data: [],
+      })
+    } else {
+      dataList.value.push({
+        date,
+        data,
+      })
+    }
   }
   let itemWidth = ref()
   const style = ref()
   // const col = ref(Math.round(Math.sqrt(dataList.value.length)))
-  const row = ref(10) //行数
-  const col = ref(3) //列数
+  const row = ref(5) //行数
+  const col = ref(6) //列数
   const containHeight = ref()
   for (let i = 0; i < dataList.value.length; i += col.value) {
     dataChunks.value.push(dataList.value.slice(i, col.value + i))

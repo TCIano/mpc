@@ -13,10 +13,10 @@
     </a-col> -->
     <a-col :span="24">
       <div>
-        <TableHeader ref="tableHeaderRef" :show-filter="true">
+        <TableHeader ref="tableHeaderRef" :show-filter="false">
           <template #top-left>
             <add-button @add="onAdditem" />
-            <DeleteButton @delete="onDeleteItems" />
+            <!-- <DeleteButton @delete="onDeleteItems" /> -->
           </template>
         </TableHeader>
         <TableBody>
@@ -26,7 +26,8 @@
               :loading="tableLoading"
               :data-source="dataList"
               :columns="tableColumns"
-              :pagination="false"
+              :pagination="true"
+              :customRow="(record:Users, index:number) => useCustomeRowSelect<Users>(record, index, 'id')"
               tableLayout="fixed"
               :rowKey="rowKey"
               :scroll="{ y: tableHeight, x: 'max-content' }"
@@ -46,7 +47,14 @@
                     <a-button ghost type="primary" @click="onEditItem(record)" size="small"
                       >编辑</a-button
                     >
-                    <a-button danger @click="onDeleteItem(record)" size="small">删除</a-button>
+                    <a-popconfirm
+                      title="是否要删除此数据?"
+                      ok-text="是"
+                      cancel-text="否"
+                      @confirm="onDeleteItem(record)"
+                    >
+                      <a-button danger size="small">删除</a-button>
+                    </a-popconfirm>
                   </a-space>
                 </template>
                 <template v-if="column.key === 'status'">
@@ -57,38 +65,41 @@
             </a-table>
           </template>
         </TableBody>
-        <TableFooter ref="tableFooterRef" :pagination="pagination" />
+        <!-- <TableFooter ref="tableFooterRef" :pagination="pagination" /> -->
       </div>
     </a-col>
     <DrawerDialog
       ref="userEditModal"
       :title="actionModal === 'add' ? '添加用户' : '编辑用户'"
-      content-height="50vh"
+      @confirm="onUserInfoConfirm"
     >
       <template #content>
-        <a-form :wrapperCol="{ span: 18 }">
+        <a-form :wrapperCol="{ span: 19 }" :labelCol="{ span: 5 }">
           <a-form-item
-            v-for="item in formItems"
+            v-for="item in formItems.filter((item) => item.hidden !== true)"
             :key="item.key"
             :label="item.label"
             :required="item.required"
           >
             <template v-if="item.type === 'input'">
-              <a-input :placeholder="item.placeholder" v-model:value="item.value.value"></a-input>
+              <a-input
+                :placeholder="item.placeholder"
+                :disabled="item.disabled"
+                v-model:value="item.value.value"
+              ></a-input>
             </template>
-            <template v-if="item.type === 'radio'">
-              <a-radio-group v-model:value="item.value.value">
-                <a-radio v-for="rad in item.optionItems" :key="rad.value" :value="rad.value">
-                  {{ rad.label }}
-                </a-radio>
-              </a-radio-group>
+            <template v-if="item.type === 'pwd'">
+              <a-input-password
+                :placeholder="item.placeholder"
+                v-model:value="item.value.value"
+              ></a-input-password>
             </template>
-            <template v-if="item.type === 'switch'">
-              <a-switch
-                v-model:checked="item.value.value"
-                checked-children="正常"
-                un-checked-children="禁用"
-              />
+            <template v-if="item.type === 'textarea'">
+              <a-textarea
+                :disabled="item.disabled"
+                :placeholder="item.placeholder"
+                v-model:value="item.value.value"
+              ></a-textarea>
             </template>
           </a-form-item>
         </a-form>
@@ -98,7 +109,6 @@
 </template>
 
 <script lang="ts">
-  import { post } from '@/api/http'
   import { getTableList } from '@/api/url'
   import {
     usePagination,
@@ -107,26 +117,40 @@
     useTable,
     useTableColumn,
     useTableHeight,
+    useCustomeRowSelect,
   } from '@/hooks/table'
   import { FormItem, ModalDialogType, DrawerDialogType } from '@/types/components'
+  import { addUserApi, deleteUserApi, getUsersApi, updateUsersApi } from '@/api/modules/index'
   import { message, Modal } from 'ant-design-vue'
-  import { defineComponent, getCurrentInstance, onMounted, ref, watch } from 'vue'
+  import { defineComponent, getCurrentInstance, onMounted, ref, watch, Ref, reactive } from 'vue'
+  import { Users } from '@/types/apis/user'
   export default defineComponent({
     name: 'UserList',
     setup() {
+      const disabledKey = 'system'
       const actionModal = ref('')
       const table = useTable()
       const rowKey = useRowKey('id')
       const pagination = usePagination(doRefresh)
       const { selectedRowKeys, onSelectChange } = useRowSelection()
+
+      const onCustomSelectRow = (record: Users) => {}
       const formItems = [
         {
-          label: '名称',
+          key: 'id',
+          value: ref(''),
+          hidden: true,
+          reset() {
+            this.value.value = ''
+          },
+        },
+        {
+          label: '用户名',
           type: 'input',
           key: 'name',
           value: ref(''),
           required: true,
-          placeholder: '请输入用户名称',
+          placeholder: '请输入用户名',
           validator: function () {
             if (!this.value.value) {
               message.error(this.placeholder)
@@ -139,16 +163,12 @@
           },
         },
         {
-          label: '性别',
-          key: 'gender',
-          value: ref(1),
-          type: 'radio',
-          optionItems: [
-            { label: '男', value: 1 },
-            { label: '女', value: 0 },
-          ],
+          label: '密码',
+          type: 'pwd',
+          key: 'pwd',
+          value: ref(''),
           required: true,
-          placeholder: '请输入用户性别',
+          placeholder: '请输入密码',
           validator: function () {
             if (!this.value.value) {
               message.error(this.placeholder)
@@ -157,189 +177,40 @@
             return true
           },
           reset() {
-            this.value.value = 1
+            this.value.value = ''
           },
         },
+
         {
-          label: '状态',
-          key: 'status',
-          value: ref(false),
-          type: 'switch',
+          label: '描述',
+          key: 'desc',
+          value: ref(''),
+          type: 'textarea',
+          placeholder: '请输入描述 ',
           reset: function () {
-            this.value.value = false
+            this.value.value = ''
           },
         },
       ] as FormItem[]
-      const departmentData = [
-        {
-          title: '东部地区',
-          key: 1,
-          children: [
-            {
-              title: '总裁部',
-              key: 11,
-            },
-            {
-              title: '财务部',
-              key: 12,
-            },
-            {
-              title: '技术部',
-              key: 13,
-            },
-            {
-              title: '销售部',
-              key: 14,
-            },
-            {
-              title: '总裁部',
-              key: 11,
-            },
-            {
-              title: '财务部',
-              key: 12,
-            },
-            {
-              title: '技术部',
-              key: 13,
-            },
-            {
-              title: '销售部',
-              key: 14,
-            },
-            {
-              title: '总裁部',
-              key: 11,
-            },
-            {
-              title: '财务部',
-              key: 12,
-            },
-            {
-              title: '技术部',
-              key: 13,
-            },
-            {
-              title: '销售部',
-              key: 14,
-            },
-          ],
-        },
-        {
-          title: '西部地区',
-          key: 2,
-          children: [
-            {
-              title: '总裁部',
-              key: 21,
-            },
-            {
-              title: '财务部',
-              key: 22,
-            },
-            {
-              title: '技术部',
-              key: 23,
-            },
-            {
-              title: '销售部',
-              key: 24,
-            },
-          ],
-        },
-        {
-          title: '南部地区',
-          key: 3,
-          children: [
-            {
-              title: '总裁部',
-              key: 31,
-            },
-            {
-              title: '财务部',
-              key: 32,
-            },
-            {
-              title: '技术部',
-              key: 33,
-            },
-            {
-              title: '销售部',
-              key: 34,
-            },
-          ],
-        },
-        {
-          title: '北部地区',
-          key: 4,
-          children: [
-            {
-              title: '总裁部',
-              key: 41,
-            },
-            {
-              title: '财务部',
-              key: 42,
-            },
-            {
-              title: '技术部',
-              key: 43,
-            },
-            {
-              title: '销售部',
-              key: 44,
-            },
-          ],
-        },
-      ]
+
       const tableColumns = useTableColumn(
         [
           table.indexColumn,
           {
-            title: '名称',
-            key: 'nickName',
-            dataIndex: 'nickName',
+            title: '用户名',
+            key: 'name',
+            dataIndex: 'name',
           },
           {
-            title: '性别',
-            key: 'gender',
-            dataIndex: 'gender',
-            width: 80,
-          },
-          // {
-          //   title: '头像',
-          //   key: 'avatar',
-          //   dataIndex: 'avatar',
-          // },
-          // {
-          //   title: '地址',
-          //   key: 'address',
-          //   dataIndex: 'address',
-          // },
-          // {
-          //   title: '登录时间',
-          //   key: 'lastLoginTime',
-          //   dataIndex: 'lastLoginTime',
-          //   width: 120,
-          // },
-          // {
-
-          //   title: '登录IP',
-          //   key: 'lastLoginIp',
-          //   dataIndex: 'lastLoginIp',
-          //   width: 100,
-          // },
-          {
-            title: '状态',
-            key: 'status',
-            dataIndex: 'status',
-            width: 80,
+            title: '描述',
+            key: 'desc',
+            dataIndex: 'desc',
           },
           {
             title: '操作',
             key: 'actions',
             fixed: 'right',
-            width: 160,
+            width: 200,
           },
         ],
         {
@@ -348,71 +219,55 @@
       )
       const userEditModal = ref<DrawerDialogType>(null)
       const expandAllFlag = ref(false)
-      function doRefresh() {
-        post({
-          url: getTableList,
-          data: () => {
-            return {
-              page: pagination.page,
-              pageSize: pagination.pageSize,
-            }
-          },
-        })
-          .then((res) => {
-            table.handleSuccess(res)
-            pagination.setTotalSize((res as any).totalSize)
-          })
-          .catch(console.log)
+      async function doRefresh() {
+        const res = await getUsersApi()
+        table.handleSuccess(res)
+        pagination.setTotalSize(res.length)
       }
-      function onDeleteItems() {
-        Modal.confirm({
-          title: '提示',
-          content: '确定要删除此数据吗？',
-          cancelText: '取消',
-          okText: '删除',
-          onOk: () => {
-            message.success(
-              '数据模拟删除成功，所选择的Keys为：' + JSON.stringify(selectedRowKeys.value)
-            )
-          },
-        })
-      }
-      function onDeleteItem(item: any) {
-        Modal.confirm({
-          title: '提示',
-          content: '确定要删除此数据吗？',
-          cancelText: '取消',
-          okText: '删除',
-          onOk: () => {
-            table.dataList.splice(table.dataList.indexOf(item), 1)
-          },
-        })
+      function onDeleteItems() {}
+      async function onDeleteItem(item: any) {
+        await deleteUserApi(item.id)
+        doRefresh()
       }
       function onEditItem(item: any) {
         actionModal.value = 'edit'
         userEditModal.value?.show()
+        formItems.forEach((it) => {
+          it.disabled = item.isSystemReserved
+          it.value.value = item[it.key] || null
+        })
       }
       function onAdditem() {
         actionModal.value = 'add'
         formItems.forEach((item) => {
+          item.disabled = false
           item.reset && item.reset()
         })
         userEditModal.value?.show()
+      }
+      const onUserInfoConfirm = async () => {
+        if (formItems.every((it) => (it.validator ? it.validator() : true))) {
+          let option = formItems.reduce((pre, cur) => {
+            ;(pre as any)[cur.key] = cur.value.value
+            return pre
+          }, {})
+          const { id, ...restRoles } = option as Users
+          if (actionModal.value === 'edit') {
+            await updateUsersApi(option as Users)
+          } else {
+            await addUserApi(restRoles as Users)
+          }
+          doRefresh()
+          userEditModal.value?.toggle()
+        }
       }
       function onUpdateExpandedKeys(keys: any) {
         getExpandedKeys.value = [...keys]
       }
       const getExpandedKeys = ref([] as Array<number>)
-      watch(
-        () => expandAllFlag.value,
-        (newVal) => {
-          newVal
-            ? (getExpandedKeys.value = departmentData.map((it) => it.key))
-            : (getExpandedKeys.value = [])
-        }
-      )
+
       onMounted(async () => {
-        table.tableHeight.value = await useTableHeight(getCurrentInstance())
+        table.tableHeight.value = (await useTableHeight(getCurrentInstance())) as number
         doRefresh()
       })
       return {
@@ -422,7 +277,6 @@
         selectedRowKeys,
         onSelectChange,
         expandAllFlag,
-        departmentData,
         tableColumns,
         pagination,
         onDeleteItem,
@@ -433,6 +287,10 @@
         formItems,
         onAdditem,
         actionModal,
+        disabledKey,
+        onUserInfoConfirm,
+        onCustomSelectRow,
+        useCustomeRowSelect,
       }
     },
   })

@@ -1,7 +1,7 @@
 <template>
   <div class="vaw-header-layout">
     <div class="logo-wrapper">
-      <Logo :always-show="true" :showTitle="false" />
+      <Logo :always-show="true" :showTitle="true" />
     </div>
     <div class="menu-wrapper" v-if="state.layoutMode === 'ttb'">
       <ScrollerMenu mode="horizontal" :routes="routes" />
@@ -26,7 +26,8 @@
       const store = useLayoutStore()
       const routes = computed(() => {
         //后面的filter可以去掉
-        return store?.state.permissionRoutes.filter((it) => !!it.name)
+        // return store?.state.permissionRoutes.filter((it) => !!it.name)
+        return store?.state.permissionRoutes
       })
       return {
         routes,
@@ -50,7 +51,11 @@
     box-sizing: border-box;
     border-bottom: 1px solid var(--border-color);
     .logo-wrapper {
-      width: calc(@menuWidth / 3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: 12px;
+      // width: calc(@menuWidth / 2);
     }
     .menu-wrapper {
       flex: 1;

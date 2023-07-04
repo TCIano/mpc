@@ -1,6 +1,7 @@
 import router, { constantRoutes, notFountCom } from '../router'
 import Cookies from 'js-cookie'
 import { post } from '@/api/http'
+import { OriginRoute } from '@/types/router'
 import { getMenuListByRoleId } from '@/api/url'
 import { RouteRecordRaw } from 'vue-router'
 import { isExternal, mapTwoLevelRouter, toHump } from './index'
@@ -8,61 +9,63 @@ import Layout from '@/layouts/Layout.vue'
 import layoutStore from '@/store'
 import { defineAsyncComponent } from 'vue'
 import LoadingComponent from '@/layouts/loading/index.vue'
+// import Page404 from '@/views/exception/404.vue'
 import { USER_TOKEN_KEY } from '@/layouts/setting/keys'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import useUserStore from '@/store/modules/user'
 import pinia from '@/store/pinia'
-
+import { getPageDataApi, getPagesByUser } from '@/api/modules'
 const userStore = useUserStore(pinia)
-
 NProgress.configure({
   showSpinner: false,
 })
 
-interface OriginRoute {
-  menuUrl: string
-  menuName?: string
-  hidden?: boolean
-  outLink?: string
-  affix?: boolean
-  cacheable?: boolean
-  iconPrefix?: string
-  icon?: string
-  badge?: string | number
-  isSingle?: boolean
-  children: Array<OriginRoute>
-}
+// interface OriginRoute {
+//   menuUrl: string
+//   menuName?: string
+//   hidden?: boolean
+//   outLink?: string
+//   affix?: boolean
+//   cacheable?: boolean
+//   iconPrefix?: string
+//   icon?: string
+//   badge?: string | number
+//   isSingle?: boolean
+//   children: Array<OriginRoute>
+// }
 
 type RouteRecordRawWithHidden = RouteRecordRaw & { hidden: boolean }
 
-function getRoutes() {
-  return post({
-    url: getMenuListByRoleId,
-    data: {
-      userId: userStore.userId,
-      roleId: userStore.roleId,
-    },
-  }).then((res: any) => {
-    return generatorRoutes(res.data)
-  })
+export async function getRoutes() {
+  try {
+    const res = await getPagesByUser(userStore.userName)
+    userStore.menus = res
+    const preMenus: OriginRoute[] = sortTree(userStore.menus)
+    return generatorRoutes(preMenus)
+  } catch (error) {
+    userStore.logout()
+  }
 }
 
 function loadComponents() {
-  console.log(import.meta.glob('../views/**/*.vue'))
-
   return import.meta.glob('../views/**/*.vue')
 }
 
 const asynComponents = loadComponents()
-
+function urlFormatter(it: OriginRoute): string {
+  return it.url.startsWith('/') ? it.url : '/' + it.url
+}
 function getComponent(it: OriginRoute) {
   // return defineAsyncComponent({
-  //   loader: asynComponents['../views' + it.menuUrl + '.vue'],
+  //   loader: asynComponents['../views' + urlFormatter(it) + '.vue'],
+  //   delay: 2000,
   //   loadingComponent: LoadingComponent,
+  //   // 加载失败后展示的组件
+  //   // errorComponent: Page404,
   // })
 
-  return asynComponents['../views' + it.menuUrl + '.vue']
+  return asynComponents['../views' + urlFormatter(it) + '.vue']
 }
 
 function getCharCount(str: string, char: string) {
@@ -73,7 +76,7 @@ function getCharCount(str: string, char: string) {
 }
 
 function isMenu(path: string) {
-  return getCharCount(path, '/') === 1
+  return getCharCount(path, '/') === 1 && path.startsWith('/')
 }
 
 function getNameByUrl(menuUrl: string) {
@@ -81,29 +84,45 @@ function getNameByUrl(menuUrl: string) {
   const IndexTemp = temp.slice(-2).join('-')
   return toHump(temp[temp.length - 1] === 'index' ? IndexTemp : temp[temp.length - 1])
 }
-
+/**
+ * 菜单排序
+ * @param tree 节点
+ * @param property 排序属性
+ */
+export function sortTree(tree: Array<OriginRoute>) {
+  const stack = []
+  stack.push(...tree)
+  while (stack.length > 0) {
+    const node = stack.pop() as OriginRoute
+    if (node?.children) {
+      stack.push(...node.children)
+      node.children.sort((a, b) => a.sortNumber - b.sortNumber)
+    }
+  }
+  tree.sort((a, b) => a.sortNumber - b.sortNumber)
+  return tree
+}
 function generatorRoutes(res: Array<OriginRoute>) {
   const tempRoutes: Array<RouteRecordRawWithHidden> = []
   res.forEach((it) => {
     const route: RouteRecordRawWithHidden | any = {
-      path: it.outLink && isExternal(it.outLink) ? it.outLink : it.menuUrl || '',
-      name: getNameByUrl(it.menuUrl),
-      hidden: !!it.hidden,
-      component: isMenu(it.menuUrl) ? Layout : getComponent(it),
+      path: it.outLink && isExternal(it.outLink) ? it.outLink : urlFormatter(it) || '',
+      name: getNameByUrl(it.url),
+      hidden: !!it.isHidden,
+      component: isMenu(it.url) ? Layout : getComponent(it),
       meta: {
-        title: it.menuName,
-        affix: !!it.affix,
-        cacheable: !!it.cacheable,
+        title: it.name,
+        affix: !!it.isFixed,
+        cacheable: !!it.isCache,
         icon: it.icon || 'MenuOutlined',
         isSingle: !!it.isSingle,
       },
     }
-    if (it.children) {
+    if (it.children && it.children.length > 0) {
       route.children = generatorRoutes(it.children)
     }
     tempRoutes.push(route)
   })
-  console.log(tempRoutes)
 
   return tempRoutes
 }
@@ -115,7 +134,7 @@ function isTokenExpired(): boolean {
   return !!token
 }
 
-router.beforeEach(async (to) => {
+router.beforeEach(async (to, from) => {
   NProgress.start()
   if (whiteRoutes.includes(to.path)) {
     return true
@@ -124,40 +143,35 @@ router.beforeEach(async (to) => {
     if (!isTokenExpired()) {
       return {
         path: '/login',
+        /**
+         * 可以配置首页路径
+         */
         query: { redirect: to.fullPath },
       }
-      // next({
-      //   path: '/login',
-      //   query: { redirect: to.fullPath },
-      // })
     } else {
       const isEmptyRoute = layoutStore.isEmptyPermissionRoute()
       if (isEmptyRoute) {
+        console.warn('执行一次')
         // 加载路由
         const accessRoutes: Array<RouteRecordRaw> = []
-        const tempRoutes = await getRoutes()
-        console.log(tempRoutes)
+        const tempRoutes = (await getRoutes()) as Array<RouteRecordRaw>
         accessRoutes.push(...tempRoutes)
         const mapRoutes = mapTwoLevelRouter(accessRoutes)
         mapRoutes.forEach((it: any) => {
           router.addRoute(it)
         })
-        // const isNotFd = router.getRoutes().findIndex((item) => item.name === NOTFDNAME)
-        // if (isNotFd === -1) {
+
         router.addRoute({
           path: '/:pathMatch(.*)*',
-          // redirect: '/404',
+          redirect: '/404',
           name: 'not-found',
-          component: notFountCom,
           hidden: true,
         } as RouteRecordRaw)
-        // }
+
         layoutStore.initPermissionRoute([...constantRoutes, ...accessRoutes])
-        // next({ ...to })
         return { ...to, replace: true }
       } else {
         return true
-        // next()
       }
     }
   }

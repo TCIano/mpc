@@ -2,13 +2,19 @@
   <a-popover v-model:visible="visible" trigger="click">
     <template #content>
       <div class="icon-container">
-        <a-input-search placeholder="搜索图标名称" enter-button @search="onSearch" allowClear />
+        <a-input-search
+          placeholder="搜索图标名称"
+          v-model:value="search"
+          enter-button
+          @search="onSearch"
+          allowClear
+        />
         <div class="mt-4"></div>
         <div class="icon-wrapper">
           <a-row :wrap="true">
             <a-col :span="4" v-for="item of iconNames" :key="item">
               <div
-                class="flex justify-center items-center flex-col icon-item"
+                class="flex flex-col items-center justify-center icon-item"
                 @click="onSelectItem(item)"
               >
                 <component :is="item" style="font-size: 22px" />
@@ -39,7 +45,7 @@
   import * as Icons from '@ant-design/icons-vue/lib/icons'
   import { useClipboard } from '@vueuse/core'
   import { message } from 'ant-design-vue'
-  import { ref, watch } from 'vue'
+  import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
   const emit = defineEmits(['onSelect', 'update:value'])
   const props = defineProps({
     value: {
@@ -51,6 +57,7 @@
       default: false,
     },
   })
+  const search = ref('')
   const iconList = Object.keys(Icons)
   const pageSize = 36
   const currentPage = ref(1)
@@ -103,6 +110,9 @@
       }
     }
   }
+  onBeforeUnmount(() => {
+    search.value = ''
+  })
 </script>
 <style lang="less" scoped>
   .icon-container {

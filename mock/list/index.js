@@ -111,18 +111,23 @@ Mock.mock(RegExp(getTableList), 'post', function ({ body }) {
     [`data|${size}`]: [
       {
         'id|+1': 1,
-        nickName: function () {
+        username: function () {
           return Random.name()
+        },
+        pwd: function () {
+          return Random.string('number', 9, 12)
         },
         'gender|0-1': 0, // 0男 1女
         'vip|0-1': 0, // 0不是 1是
+        'type|1': ['system', ''],
+
         // address: function () {
         //   return Random.city(true)
         // },
         // lastLoginTime: Random.now('yyyy-MM-dd HH:mm:ss'),
-        // lastLoginIp: function () {
-        //   return Random.ip()
-        // },
+        dec: function () {
+          return Random.ip()
+        },
         'status|0-1': 1, // 0 禁用 1正常
       },
     ],

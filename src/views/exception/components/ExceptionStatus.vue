@@ -17,6 +17,8 @@
   import image_403 from '@/assets/img_403.png'
   import image_500 from '@/assets/img_500.png'
   import { defineComponent } from 'vue'
+  import useUserStore from '@/store/modules/user'
+  const userStore = useUserStore()
   export default defineComponent({
     name: 'ExceptionStatus',
     props: {
@@ -54,7 +56,7 @@
     },
     methods: {
       backHome() {
-        this.$router.replace({ path: '/' })
+        this.$router.replace({ path: userStore.redirectURL || '/' })
       },
     },
   })

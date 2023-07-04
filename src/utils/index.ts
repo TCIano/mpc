@@ -105,8 +105,6 @@ export function transfromRoutes(
     }
     tempRoutes.push(tempRoute)
   })
-  console.log(tempRoutes)
-
   return tempRoutes
 }
 

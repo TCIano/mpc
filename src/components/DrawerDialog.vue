@@ -1,9 +1,10 @@
 <template>
   <a-drawer
+    :width="width"
     v-model:visible="showModal"
     :title="title"
     class="drawer-dialog-wrapper"
-    @cancel="onCancel"
+    @close="onCancel"
   >
     <template #extra>
       <a-space>
@@ -11,7 +12,7 @@
         <a-button @click="onConfirm" type="primary">确定</a-button>
       </a-space>
     </template>
-    <div :style="{ maxHeight: '50vh', overflow: 'auto' }">
+    <div>
       <slot name="content"></slot>
     </div>
   </a-drawer>
@@ -22,15 +23,19 @@
   import { useLayoutStore } from '@/layouts'
 
   export default defineComponent({
-    name: 'ModalDialog',
+    name: 'DrawerDialog',
     props: {
+      width: {
+        type: Number,
+        default: 378,
+      },
       title: {
         type: String,
         default: '操作',
       },
       contentHeight: {
         type: String,
-        default: '30vh',
+        default: '100vh',
       },
     },
     emits: ['confirm', 'cancel'],
@@ -59,6 +64,7 @@
         showModal.value = false
         emit('cancel')
       }
+
       return {
         showModal,
         bodyStyle,

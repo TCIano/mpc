@@ -1,8 +1,8 @@
 <template>
   <div class="logo-wrapper">
-    <img v-if="showLogo" class="logo-img" src="../../assets/logo.png" />
+    <img v-if="showLogo" class="logo-img" :src="importImg" />
     <div v-if="showTitle" :class="[!state.isCollapse || alwaysShow ? 'show-title' : 'close-title']">
-      <!-- <span class="logo-title">{{ projectName }}</span> -->
+      <span class="logo-title">{{ state.projectName }}</span>
     </div>
   </div>
 </template>
@@ -10,7 +10,8 @@
 <script lang="ts">
   import { defineComponent } from 'vue'
   import { useLayoutStore } from '../index'
-  import { projectName } from '../../setting'
+  import { getAssetsHomeFile } from '@/utils/utils'
+  // import { projectName } from '../../setting'
   export default defineComponent({
     name: 'Logo',
     props: {
@@ -29,9 +30,11 @@
     },
     setup() {
       const store = useLayoutStore()
+      const importImg = getAssetsHomeFile(store.state.projectLogo)
       return {
         state: store?.state,
-        projectName,
+        // projectName,
+        importImg,
       }
     },
   })
@@ -44,11 +47,11 @@
     align-items: center;
     border-bottom: 1px dashed var(--border-color);
     .logo-img {
-      // width: 30px;
-      // width: 100%;
-      // height: 100%;
+      width: calc(@menuWidth / 3);
     }
     .logo-title {
+      margin-left: 10px;
+      font-size: 20px;
       font-weight: bold;
     }
     .show-title {

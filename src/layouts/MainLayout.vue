@@ -101,7 +101,7 @@
 
 <style lang="less" scoped>
   .scrollbar::-webkit-scrollbar {
-    width: 0;
+    width: 0px;
   }
   .main-layout-open-status {
     margin-left: @menuWidth;

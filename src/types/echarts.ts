@@ -6,6 +6,7 @@ import {
   TitleComponentOption,
   GraphicComponentOption,
   DatasetComponentOption,
+  MarkLineComponentOption,
 } from 'echarts/components'
 type chartOption = echarts.ComposeOption<
   | BarSeriesOption
@@ -15,6 +16,7 @@ type chartOption = echarts.ComposeOption<
   | TooltipComponentOption
   | GraphicComponentOption
   | DatasetComponentOption
+  | MarkLineComponentOption
 >
 
 export { chartOption }

@@ -52,6 +52,32 @@ export default ({ mode }) => {
     },
     server: {
       open: true,
+      proxy: {
+        '/api/pltf': {
+          target: 'http://192.168.0.49:62101',
+          changeOrigin: true,
+        },
+        '/api/pms': {
+          target: 'http://192.168.0.49:62102',
+          changeOrigin: true,
+        },
+        // '/api/MPC': {
+        //   target: 'http://192.168.0.210:62103',
+        //   changeOrigin: true,
+        // },
+        // '/api/DPC/Watch': {
+        //   target: 'http://192.168.0.49:64585',
+        //   changeOrigin: true,
+        // },
+        '/api/DPC': {
+          target: 'http://192.168.0.49:62103',
+          changeOrigin: true,
+        },
+        '/api/IPY': {
+          target: 'http://192.168.0.49:62105',
+          changeOrigin: true,
+        },
+      },
     },
     optimizeDeps: {
       include: [],

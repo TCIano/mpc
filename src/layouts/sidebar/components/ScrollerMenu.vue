@@ -36,12 +36,12 @@
     watch,
     watchEffect,
   } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import { LocationQueryValue, useRoute, useRouter } from 'vue-router'
   import { useLayoutStore } from '../../index'
   import { RouteRecordRawWithHidden } from '../../../types/store'
   import { isExternal, transfromMenu } from '../../../utils'
   import { MenuOption } from '@/utils'
-
+  const IframeName = 'Iframe'
   export default defineComponent({
     name: 'ScrollerMenu',
     props: {
@@ -57,7 +57,7 @@
     setup(props) {
       const store = useLayoutStore()
       const menuOptions = shallowReactive([] as Array<any>)
-      const defaultPath = ref([] as Array<string>)
+      const defaultPath = ref([] as Array<string | LocationQueryValue | LocationQueryValue[]>)
       const defaultExpandKeys = ref([] as Array<string>)
       const menuMode = computed(() => props.mode)
       const tag = ref(menuMode.value === 'inline' ? 'Scrollbar' : 'div')
@@ -72,7 +72,11 @@
       })
       const currentRoute = useRoute()
       const router = useRouter()
-      defaultPath.value.push(currentRoute.fullPath)
+      const currentRoutePath =
+        currentRoute.name === IframeName
+          ? currentRoute.query.url || currentRoute.fullPath
+          : currentRoute.fullPath
+      defaultPath.value.push(currentRoutePath)
       onMounted(() => {
         handleMenu(props.routes)
         handleExpandPath()
@@ -86,17 +90,23 @@
         const tempMenus = transfromMenu(routes || [])
         menuOptions.push(...tempMenus)
       }
-      function getAllParentNodes(tree: MenuOption[], code: string) {
+      /**
+       * 找到
+       * @param tree 菜单
+       * @param code 菜单key
+       */
+      function getAllParentNodes(
+        tree: MenuOption[],
+        code: string | LocationQueryValue | LocationQueryValue[]
+      ) {
         let arr: any = [] //要返回的数组
         for (let i = 0; i < tree.length; i++) {
           let item = tree[i]
           arr = []
-          arr.push(item.key) //保存当前节点id
+          arr.push(item.key)
           if (code == item.key) {
-            //判断当前id是否是默认id
-            return arr //是则退出循环、返回数据
+            return arr
           } else {
-            //否则进入下面判断，判断当前节点是否有子节点数据
             if (item.children && item.children.length > 0) {
               //合并子节点返回的数据
               arr = arr.concat(getAllParentNodes(item.children, code))
@@ -110,10 +120,11 @@
       }
       function handleExpandPath() {
         if (props.mode === 'inline') {
-          console.log(currentRoute, props.routes, menuOptions)
-          const paths = currentRoute.fullPath
+          const paths =
+            currentRoute.name === IframeName
+              ? currentRoute.query.url || currentRoute.fullPath
+              : currentRoute.fullPath
           let pathList = getAllParentNodes(menuOptions, paths)
-
           // const paths = currentRoute.fullPath.split('/')
           // const pathList = paths
           //   .filter((it) => !!it)
@@ -126,20 +137,21 @@
         }
       }
       function onMenuClick({ key, item, keyPath }: any) {
-        console.log(keyPath)
+        console.log(key)
 
         if (isExternal(key)) {
           window.open(key)
         } else {
           let isIframe = router.getRoutes().find((item) => item.path === key)?.components
-          if (!isIframe)
-            return router.push({
-              path: '/iframe',
-              query: {
-                url: key,
-                title: item.title,
-              },
-            })
+
+          // if (!isIframe)
+          //   return router.push({
+          //     name: IframeName,
+          //     query: {
+          //       url: key,
+          //       title: item.title,
+          //     },
+          //   })
           router.push(key)
           if (store.state.device === 'mobile') {
             store.toggleCollapse(true)
@@ -147,9 +159,11 @@
         }
       }
       watch(
-        () => currentRoute.fullPath,
+        () => router.currentRoute.value,
         (newVal) => {
-          defaultPath.value = [newVal]
+          let newPath =
+            newVal.name === IframeName ? newVal.query.url || newVal.fullPath : newVal.fullPath
+          defaultPath.value = [newPath]
           handleExpandPath()
         }
       )

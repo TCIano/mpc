@@ -1,9 +1,17 @@
+import { OriginRoute } from '@/types/router'
 export interface UserState {
-  userId: number
-  token: string
+  result: boolean
+  errMsg: string
+  userId?: number
+  access_token: string
   roleId: number
   roles: string[] | null
-  userName: string
-  nickName: string
-  avatar: string
+  username: string
+  redirectURL: string
+  // nickName: string
+  avatar?: string
+  menus: Array<OriginRoute>
+}
+export interface MpcState {
+  onlineUrl: string
 }

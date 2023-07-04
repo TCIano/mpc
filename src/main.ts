@@ -42,6 +42,7 @@ app.use(LayoutStore, {
   },
 })
 app.use(pinia)
+
 app.use(router)
 router.isReady().then(() => {
   app.mount('#app')

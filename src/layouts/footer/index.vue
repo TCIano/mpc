@@ -1,19 +1,22 @@
 <template>
   <a-card class="footer-container" :bodyStyle="{ padding: 0 }">
-    Copyright © {{ projectName }} {{ nowYear }}
+    Copyright © {{ state.projectName }} {{ nowYear }}
   </a-card>
 </template>
 
 <script lang="ts">
   import { defineComponent } from 'vue'
-  import { projectName } from '../../setting'
-
+  // import { projectName } from '../../setting'
+  import { useLayoutStore } from '@/layouts'
   export default defineComponent({
     name: 'Footer',
     setup() {
+      const store = useLayoutStore()
+      const state = store?.state
       let nowYear = new Date().getFullYear()
       return {
-        projectName,
+        // projectName,
+        state,
         nowYear,
       }
     },

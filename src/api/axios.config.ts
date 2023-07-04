@@ -1,7 +1,8 @@
 import Axios, { AxiosResponse } from 'axios'
+import Cookies from 'js-cookie'
 import qs from 'qs'
 
-export const baseURL = 'http://localhost:8080/'
+export const baseURL = import.meta.env.VITE_MPC_BASE_URL
 
 export const CONTENT_TYPE = 'Content-Type'
 
@@ -11,20 +12,29 @@ export const APPLICATION_JSON = 'application/json; charset=UTF-8'
 
 export const TEXT_PLAIN = 'text/plain; charset=UTF-8'
 
+import { USER_TOKEN_KEY } from '@/layouts/setting/keys'
+
 const service = Axios.create({
-  baseURL,
+  // baseURL,
   timeout: 10 * 60 * 1000,
   withCredentials: true, // 跨域请求时发送cookie
+  // headers: {
+  //   'Access-Control-Allow-Origin': '*',
+  // },
 })
 
 service.interceptors.request.use(
   (config) => {
-    !config.headers && (config.headers = {})
-    if (!config.headers[CONTENT_TYPE]) {
-      config.headers[CONTENT_TYPE] = APPLICATION_JSON
-    }
-    if (config.headers[CONTENT_TYPE] === FORM_URLENCODED) {
-      config.data = qs.stringify(config.data)
+    const token = Cookies.get(USER_TOKEN_KEY)
+    if (token) {
+      !config.headers && (config.headers = {})
+      config.headers.Authorization = `Bearer ${token}`
+      if (!config.headers[CONTENT_TYPE]) {
+        config.headers[CONTENT_TYPE] = APPLICATION_JSON
+      }
+      if (config.headers[CONTENT_TYPE] === FORM_URLENCODED) {
+        config.data = qs.stringify(config.data)
+      }
     }
     return config
   },

@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
   import { computed } from 'vue'
-  import { useLayoutStore } from '..'
+  import { useLayoutStore } from '@/layouts'
   const store = useLayoutStore()
   const waterMark = computed(
     () =>

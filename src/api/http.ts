@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios'
 import type { App } from 'vue'
 import request from './axios.config'
-
+import { message } from 'ant-design-vue'
 export interface HttpOption {
   url: string
   data?: any
@@ -13,8 +13,8 @@ export interface HttpOption {
 
 export interface Response {
   totalSize: number | 0
-  code: number
-  msg: string
+  result: boolean
+  errMsg: string
   data: any
 }
 /**
@@ -24,14 +24,17 @@ export interface Response {
  */
 function http({ url, data, method, headers, beforeRequest, afterRequest }: HttpOption) {
   const successHandler = (res: AxiosResponse<Response>) => {
-    if (res.data.code === 200) {
+    if (res.data.result) {
+      return res.data.data
+    } else {
+      message.warning(res.data.errMsg || '请求失败，未知异常')
       return res.data
+      throw new Error(res.data.errMsg || '请求失败，未知异常')
     }
-    throw new Error(res.data.msg || '请求失败，未知异常')
   }
   const failHandler = (error: Response) => {
     afterRequest && afterRequest()
-    throw new Error(error.msg || '请求失败，未知异常')
+    throw new Error(error.errMsg || '请求失败，未知异常')
   }
   beforeRequest && beforeRequest()
   method = method || 'GET'
@@ -47,7 +50,7 @@ export function get({
   method = 'GET',
   beforeRequest,
   afterRequest,
-}: HttpOption): Promise<Response> {
+}: HttpOption): Promise<Response | any> {
   return http({
     url,
     method,
@@ -64,7 +67,7 @@ export function post({
   headers,
   beforeRequest,
   afterRequest,
-}: HttpOption): Promise<Response> {
+}: HttpOption): Promise<Response | any> {
   return http({
     url,
     method,

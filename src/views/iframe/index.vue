@@ -3,7 +3,6 @@
 </template>
 
 <script lang="ts">
-  import { use } from 'echarts/core'
   import { onMounted, ref, defineComponent } from 'vue'
   import { useRoute } from 'vue-router'
   export default defineComponent({
@@ -16,7 +15,7 @@
       onMounted(() => {
         height.value = myFrame.value!.parentElement!.clientHeight
         iSrc.value = route.query.url
-        console.log(iSrc.value, myFrame.value)
+        console.log(iSrc.value)
       })
       return {
         myFrame,

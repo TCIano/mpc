@@ -83,7 +83,7 @@
   }
   const openPerformance = (title: string) => {
     router.push({
-      path: '/performance',
+      path: 'performance',
       query: {
         title,
       },

@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import type { TreeProps } from 'ant-design-vue'
 import { DataNode } from 'ant-design-vue/lib/tree'
 import { customRef } from 'vue'
+import { varColor } from '@/types/apis/dpc/mpc'
 /**
  * 函数防抖
  * @param fn 被防抖函数
@@ -73,4 +74,24 @@ export const getParentKey = (key: string | number, tree: TreeProps['treeData']):
     }
   }
   return parentKey
+}
+
+// 获取assets静态资源
+export const getAssetsHomeFile = (url: string) => {
+  const path = `../assets/${url}.png`
+  const modules = import.meta.globEager('../assets/*')
+  return modules[path] ? modules[path].default : ''
+}
+/**
+ *  根据变量拿到对应颜色
+ * @param text 变量值
+ * @returns string
+ */
+export const handleVarColor = (text: string) => {
+  const isHas = varColor.hasOwnProperty(text)
+  if (isHas) {
+    return varColor[text]
+  } else {
+    return varColor.other
+  }
 }

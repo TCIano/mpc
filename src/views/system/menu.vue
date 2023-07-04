@@ -22,18 +22,18 @@
               <component :is="record.icon || 'MenuOutlined'" style="font-size: 18px" />
             </template>
             <template v-if="column.key === 'cacheable'">
-              <a-tag size="small" :color="record.cacheable ? 'success' : 'error'">
-                {{ record.cacheable ? '是' : '否' }}
+              <a-tag size="small" :color="record.isCache ? 'success' : 'error'">
+                {{ record.isCache ? '是' : '否' }}
               </a-tag>
             </template>
             <template v-if="column.key === 'hidden'">
-              <a-tag size="small" :color="record.hidden ? 'success' : 'error'">
-                {{ record.hidden ? '是' : '否' }}
+              <a-tag size="small" :color="record.isHidden ? 'success' : 'error'">
+                {{ record.isHidden ? '是' : '否' }}
               </a-tag>
             </template>
             <template v-if="column.key === 'affix'">
-              <a-tag size="small" :color="record.affix ? 'success' : 'error'">
-                {{ record.affix ? '是' : '否' }}
+              <a-tag size="small" :color="record.isFixed ? 'success' : 'error'">
+                {{ record.isFixed ? '是' : '否' }}
               </a-tag>
             </template>
             <template v-if="column.key === 'actions'">
@@ -41,31 +41,38 @@
                 <a-button ghost type="primary" @click="onUpdateItem(record)" size="small">
                   编辑
                 </a-button>
-                <a-button danger size="small" @click="onDeleteItem(record)">删除</a-button>
+                <a-popconfirm
+                  title="是否要删除此数据?"
+                  ok-text="是"
+                  cancel-text="否"
+                  @confirm="onDeleteItem(record)"
+                >
+                  <a-button danger size="small">删除</a-button>
+                </a-popconfirm>
               </a-space>
             </template>
           </template>
         </a-table>
       </template>
     </TableBody>
-    <ModalDialog
+    <DrawerDialog
       ref="modalDialog"
       :title="actionModel === 'add' ? '添加菜单' : '编辑菜单'"
       @confirm="onConfirm"
     >
       <template #content>
-        <a-form :wrapperCol="{ span: 18 }">
+        <a-form :wrapperCol="{ span: 18 }" ref="dataForm">
           <a-form-item
             :class="[item.required ? 'form-item__require' : 'form-item__no_require']"
             :label="item.label"
-            v-for="item of itemFormOptions"
+            v-for="item of itemFormOptions.filter((item) => item.label !== 'id')"
             :key="item.key"
           >
             <template v-if="item.type === 'tree-select'">
               <a-tree-select
                 v-model:value="item.value.value"
                 show-search
-                :fieldNames="{ label: 'menuName', key: 'menuUrl', value: 'menuUrl' }"
+                :fieldNames="{ label: 'name', key: 'id', value: 'id' }"
                 style="width: 100%"
                 :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
                 :placeholder="item.placeholder"
@@ -77,6 +84,9 @@
             <template v-if="item.type === 'input'">
               <a-input v-model:value="item.value.value" :placeholder="item.placeholder"></a-input>
             </template>
+            <template v-if="item.type === 'numberInput'">
+              <a-input-number style="width: 100%" v-model:value="item.value.value"></a-input-number>
+            </template>
             <template v-if="item.type === 'icon'">
               <IconSelector v-model:value="item.value.value"></IconSelector>
             </template>
@@ -86,17 +96,18 @@
           </a-form-item>
         </a-form>
       </template>
-    </ModalDialog>
+    </DrawerDialog>
   </div>
 </template>
 
 <script lang="ts">
-  import { defineComponent, onMounted, ref, Ref } from 'vue'
-  import { post } from '@/api/http'
-  import { getMenuList } from '@/api/url'
+  import { defineComponent, onMounted, ref, Ref, onActivated } from 'vue'
+  import { addPageApi, deletePageApi, getPageDataApi, updatePageApi } from '@/api/modules'
   import { useRowKey, useTable, useTableColumn } from '@/hooks/table'
   import { DataFormType, ModalDialogType, FormItem } from '@/types/components'
-  import { message, Modal } from 'ant-design-vue'
+  import { message, Modal, FormInstance } from 'ant-design-vue'
+  import { PageData } from '@/types/apis/pages'
+  import { sortTree } from '@/utils/router'
   export default defineComponent({
     name: 'Menu',
     setup() {
@@ -104,19 +115,19 @@
       let tempItem: { menuUrl: string } | null = null
       const table = useTable()
       const modalDialog = ref<ModalDialogType | null>(null)
-      const dataForm = ref<DataFormType | null>(null)
-      const rowKey = useRowKey('menuUrl')
+      const dataForm = ref<FormInstance | null>(null)
+      const rowKey = useRowKey('id')
       const tableColumns = useTableColumn(
         [
           {
             title: '菜单名称',
             key: 'menuName',
-            dataIndex: 'menuName',
+            dataIndex: 'name',
           },
           {
             title: '菜单地址',
             key: 'menuUrl',
-            dataIndex: 'menuUrl',
+            dataIndex: 'url',
           },
           {
             title: '菜单图标',
@@ -125,17 +136,17 @@
           {
             title: '是否缓存',
             key: 'cacheable',
-            dataIndex: 'cacheable',
+            dataIndex: 'isCache',
           },
           {
             title: '是否隐藏',
             key: 'hidden',
-            dataIndex: 'hidden',
+            dataIndex: 'isHidden',
           },
           {
             title: '是否固定标题栏',
             key: 'affix',
-            dataIndex: 'affix',
+            dataIndex: 'isFixed',
           },
           {
             title: '操作',
@@ -148,22 +159,30 @@
       )
       const itemFormOptions = [
         {
+          label: 'id',
+          key: 'id',
+          value: ref(null),
+          reset: function () {
+            this.value.value = null
+          },
+        },
+        {
           label: '上级菜单',
-          key: 'parentPath',
-          value: ref(undefined),
+          key: 'parentId',
+          value: ref<string>(),
           placeholder: '请选择上级菜单',
           type: 'tree-select',
           reset: function () {
-            this.value.value = undefined
+            this.value.value = ''
           },
         },
         {
           label: '菜单名称',
-          key: 'menuName',
+          key: 'name',
           required: true,
           type: 'input',
           placeholder: '请输入菜单名称',
-          value: ref(''),
+          value: ref(undefined),
           validator: function () {
             if (!this.value.value) {
               message.error(this.placeholder)
@@ -172,12 +191,12 @@
             return true
           },
           reset: function () {
-            this.value.value = ''
+            this.value.value = undefined
           },
         },
         {
           label: '菜单地址',
-          key: 'menuUrl',
+          key: 'url',
           required: true,
           value: ref(''),
           type: 'input',
@@ -194,14 +213,23 @@
             this.value.value = ''
           },
         },
+        // {
+        //   label: '外链地址',
+        //   key: 'outLink',
+        //   type: 'input',
+        //   placeholder: '请输入外链地址',
+        //   value: ref(''),
+        //   reset: function () {
+        //     this.value.value = ''
+        //   },
+        // },
         {
-          label: '外链地址',
-          key: 'outLink',
-          type: 'input',
-          placeholder: '请输入外链地址',
-          value: ref(''),
+          label: '菜单排序',
+          key: 'sortNumber',
+          type: 'numberInput',
+          value: ref(0),
           reset: function () {
-            this.value.value = ''
+            this.value.value = 0
           },
         },
         {
@@ -215,7 +243,7 @@
         },
         {
           label: '是否缓存',
-          key: 'cacheable',
+          key: 'isCache',
           type: 'switch',
           value: ref(false),
           reset: function () {
@@ -224,7 +252,7 @@
         },
         {
           label: '是否隐藏',
-          key: 'hidden',
+          key: 'isHidden',
           type: 'switch',
           value: ref(false),
           reset: function () {
@@ -233,7 +261,7 @@
         },
         {
           label: '是否固定',
-          key: 'affix',
+          key: 'isFixed',
           type: 'switch',
           value: ref(false),
           reset: function () {
@@ -241,71 +269,64 @@
           },
         },
       ] as Array<FormItem>
-      function doRefresh() {
-        post({
-          url: getMenuList,
-          data: {},
+
+      function removeEmptyChildren(tree: any) {
+        tree.forEach((node: any) => {
+          if (node.children && node.children.length === 0) {
+            delete node.children
+          } else if (node.children) {
+            removeEmptyChildren(node.children)
+          }
         })
-          .then(table.handleSuccess)
-          .catch(console.log)
+      }
+
+      async function doRefresh() {
+        let res = await getPageDataApi()
+        removeEmptyChildren(res)
+        res = sortTree(res)
+        table.handleSuccess(res)
       }
       function onAddItem() {
         actionModel.value = 'add'
         itemFormOptions.forEach((it) => {
+          it.disabled = false
           it.reset && it.reset()
         })
         modalDialog.value?.show()
       }
       function onUpdateItem(item: any) {
         actionModel.value = 'edit'
-        tempItem = item
         itemFormOptions.forEach((it) => {
-          it.value.value = item[it.key] || null
-          if (it.key === 'menuUrl' && it.disabled) {
-            ;(it.disabled as Ref<boolean>).value = true
-          }
+          it.value.value = item[it.key]
         })
         modalDialog.value?.show()
       }
-      function onConfirm() {
-        if (actionModel.value === 'add') {
-          if (itemFormOptions.every((it) => (it.validator ? it.validator() : true))) {
-            modalDialog.value?.close()
-            message.success(
-              '模拟创建菜单成功, 参数为:' +
-                JSON.stringify(
-                  itemFormOptions.reduce((pre, cur) => {
-                    ;(pre as any)[cur.key] = cur.value.value || ''
-                    return pre
-                  }, {})
-                )
-            )
+      async function onConfirm() {
+        if (itemFormOptions.every((it) => (it.validator ? it.validator() : true))) {
+          let option = itemFormOptions.reduce((pre, cur) => {
+            ;(pre as any)[cur.key] = cur.value.value
+            return pre
+          }, {})
+          if (actionModel.value === 'add') {
+            const { id, ...restOption } = option as PageData
+            await addPageApi(restOption)
+          } else {
+            await updatePageApi(option as PageData)
           }
-        } else {
-          // if (dataForm.value?.validator()) {
-          //   const params = dataForm.value?.generatorParams()
-          //   if (tempItem) {
-          //     const tempRoute = findRouteByUrl(layoutStore.state.permissionRoutes, tempItem.menuUrl)
-          //     if (tempRoute && tempRoute.meta && tempRoute.meta.badge) {
-          //       ;(tempRoute.meta as any).badge = (params as any).badge || ''
-          //     }
-          //   }
-          //   message.success('模拟修改菜单成功, 参数为:' + JSON.stringify(params))
-          // }
+          doRefresh()
+          modalDialog.value?.close()
         }
       }
-      function onDeleteItem(item: any) {
-        Modal.confirm({
-          title: '提示',
-          content: '是否要删除此数据？',
-          okText: '删除',
-          cancelText: '取消',
-          onOk: () => {
-            message.success('模拟删除成功，参数为：' + JSON.stringify(item))
-          },
-        })
+      async function onDeleteItem(item: any) {
+        await deletePageApi(item.id)
+        doRefresh()
       }
-      onMounted(doRefresh)
+      onMounted(() => {
+        doRefresh()
+      })
+      onActivated(() => {
+        console.log(111)
+      })
       return {
         rowKey,
         actionModel,
@@ -322,3 +343,9 @@
     },
   })
 </script>
+
+<style lang="less" scoped>
+  :deep(.ant-table-cell .ant-table-cell-with-append) {
+    text-align: end;
+  }
+</style>

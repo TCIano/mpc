@@ -23,32 +23,43 @@
                 <a-button ghost type="primary" @click="onUpdateItem(record)" size="small"
                   >编辑</a-button
                 >
-                <a-button danger size="small" @click="onDeleteItem(record)">删除</a-button>
-                <a-button ghost type="primary" size="small" @click="onShowMenu(record)">
+                <a-popconfirm
+                  title="是否要删除此数据?"
+                  ok-text="是"
+                  cancel-text="否"
+                  @confirm="onDeleteItem(record)"
+                >
+                  <a-button danger size="small">删除</a-button>
+                </a-popconfirm>
+                <!-- <a-button ghost type="primary" size="small" @click="onShowMenus(record)">
+                  <template #icon>
+                    <audit-outlined />
+                  </template>
                   菜单权限
                 </a-button>
+                <a-button size="small" @click="onShowUsers(record)">
+                  <template #icon>
+                    <user-switch-outlined />
+                  </template>
+                  用户
+                </a-button> -->
               </a-space>
             </template>
           </template>
         </a-table>
       </template>
     </TableBody>
-    <ModalDialog ref="modalDialogRef" :title="actionTitle" @confirm="onDataFormConfirm">
+    <DrawerDialog ref="modalDialogRef" :title="actionTitle" @confirm="onDataFormConfirm">
       <template #content>
         <a-form>
           <a-form-item
             :class="[item.required ? 'form-item__require' : 'form-item__no_require']"
             :label="item.label"
-            v-for="item of formItems"
+            v-for="item of formItems.filter((item) => item.label !== 'id')"
             :key="item.key"
           >
             <template v-if="item.type === 'input'">
-              <a-input
-                :addon-before="item.key === 'roleCode' ? ROLE_CODE_FLAG : ''"
-                :placeholder="item.placeholder"
-                v-model:value="item.value.value"
-              >
-              </a-input>
+              <a-input :placeholder="item.placeholder" v-model:value="item.value.value"> </a-input>
             </template>
             <template v-if="item.type === 'textarea'">
               <a-textarea
@@ -57,11 +68,30 @@
                 :auto-size="{ minRows: 3, maxRows: 5 }"
               />
             </template>
+            <template v-if="item.type === 'tree-menus'">
+              <a-tree
+                :tree-data="store.menus"
+                checkable
+                :fieldNames="{ title: 'name', key: 'id' }"
+                v-model:expandedKeys="defaultExpandedUserKeys"
+                v-model:checkedKeys="item.value.value"
+                @check="checkNode"
+              />
+            </template>
+            <template v-if="item.type === 'tree-users'">
+              <a-tree
+                :tree-data="treeUsers"
+                checkable
+                :fieldNames="{ title: 'name', key: 'id' }"
+                v-model:expandedKeys="defaultExpandedUserKeys"
+                v-model:checkedKeys="item.value.value"
+              />
+            </template>
           </a-form-item>
         </a-form>
       </template>
-    </ModalDialog>
-    <ModalDialog ref="menuModalDialogRef" title="编辑菜单权限" @confirm="onMenuConfirm">
+    </DrawerDialog>
+    <!-- <DrawerDialog ref="menuModalDialogRef" title="编辑菜单权限" @confirm="onMenuConfirm">
       <template #content>
         <a-tree
           :tree-data="menuData"
@@ -70,22 +100,42 @@
           v-model:checkedKeys="defaultCheckedKeys"
         />
       </template>
-    </ModalDialog>
+    </DrawerDialog> -->
   </div>
 </template>
 
 <script lang="ts">
-  import { post } from '@/api/http'
-  import { getMenuListByRoleId, getRoleList } from '@/api/url'
+  import {
+    addRoleApi,
+    getRolesApi,
+    getUsersApi,
+    getUsersByRoleIdApi,
+    getPagesByRoleIdApi,
+    updateUsersByRidApi,
+    updatePagesByRidApi,
+  } from '@/api/modules/index'
   import { useRowKey, useTable, useTableColumn } from '@/hooks/table'
+  import { Users } from '@/types/apis/user'
+  import { Roles, UserByRidRes, PageByidRes } from '@/types/apis/roles'
   import { ModalDialogType, FormItem } from '@/types/components'
   import { message, Modal } from 'ant-design-vue'
+  import useUserStore from '@/store/modules/user'
   import { defineComponent, nextTick, onMounted, ref, shallowReactive } from 'vue'
+  import { deleteRoleApi, updateRolesApi } from '@/api/modules/roles'
   const ROLE_CODE_FLAG = 'ROLE_'
   const formItems = [
     {
+      label: 'id',
+      key: 'id',
+      value: ref(null),
+      reset: function () {
+        this.value.value = null
+      },
+    },
+    {
       label: '角色名称',
       type: 'input',
+      disabled: false,
       key: 'name',
       value: ref(''),
       required: true,
@@ -97,28 +147,39 @@
         }
         return true
       },
-    },
-    {
-      label: '角色编号',
-      key: 'roleCode',
-      value: ref(''),
-      type: 'input',
-      required: true,
-      placeholder: '请输入角色编号',
-      validator: function () {
-        if (!this.value.value) {
-          message.error(this.placeholder)
-          return false
-        }
-        return true
+      reset: function () {
+        this.value.value = ''
       },
     },
+
     {
       label: '角色描述',
-      key: 'description',
+      key: 'desc',
+      disabled: false,
       value: ref(''),
       type: 'textarea',
       placeholder: '请输入角色描述',
+      reset: function () {
+        this.value.value = ''
+      },
+    },
+    {
+      label: '菜单权限',
+      key: 'pages',
+      value: ref([]),
+      type: 'tree-menus',
+      reset: function () {
+        this.value.value = []
+      },
+    },
+    {
+      label: '用户',
+      key: 'users',
+      value: ref([]),
+      type: 'tree-users',
+      reset: function () {
+        this.value.value = []
+      },
     },
   ] as FormItem[]
   function handleMenuData(
@@ -138,7 +199,6 @@
       }
       tempMenus.push(tempMenu)
     })
-    console.log(tempMenus)
     return tempMenus
   }
   export default defineComponent({
@@ -150,6 +210,8 @@
       const rowKey = useRowKey('id')
       const actionTitle = ref('添加角色')
       const menuData = shallowReactive([] as Array<any>)
+      const store = useUserStore()
+      const treeUsers = ref<Users>()
       const tableColumns = useTableColumn(
         [
           table.indexColumn,
@@ -158,26 +220,13 @@
             key: 'name',
             dataIndex: 'name',
           },
-          {
-            title: '角色编号',
-            key: 'roleCode',
-            dataIndex: 'roleCode',
-          },
+
           {
             title: '角色描述',
-            key: 'description',
-            dataIndex: 'description',
+            key: 'desc',
+            dataIndex: 'desc',
           },
-          {
-            title: '创建时间',
-            key: 'createTime',
-            dataIndex: 'createTime',
-          },
-          {
-            title: '角色编号',
-            key: 'roleCode',
-            dataIndex: 'roleCode',
-          },
+
           {
             title: '操作',
             key: 'actions',
@@ -187,82 +236,81 @@
       )
       const defaultCheckedKeys = ref([] as Array<string>)
       const defaultExpandedKeys = ref([] as Array<string>)
-      function doRefresh() {
-        post({
-          url: getRoleList,
-          data: {},
-        })
-          .then(table.handleSuccess)
-          .catch(console.log)
+      const defaultCheckedUserKeys = ref([] as Array<string>)
+      const defaultExpandedUserKeys = ref([] as Array<string>)
+      async function doRefresh() {
+        let res = await getRolesApi()
+        table.handleSuccess(res)
+      }
+      //获取菜单/用户
+      const getUserList = async () => {
+        treeUsers.value = await getUsersApi()
       }
       function onAddItem() {
         actionTitle.value = '添加角色'
+        formItems.forEach((it) => {
+          it.disabled = false
+          it.reset && it.reset()
+        })
         modalDialogRef.value?.toggle()
       }
-      function onUpdateItem(item: any) {
+      async function onUpdateItem(item: any) {
         actionTitle.value = '编辑角色'
+        let users = await getUsersByRoleIdApi(item.id)
+        let menus = await getPagesByRoleIdApi(item.id)
         modalDialogRef.value?.toggle()
         nextTick(() => {
           formItems.forEach((it) => {
             const key = it.key
-            const propName = item[key]
-            if (propName) {
-              if (it.key === 'roleCode') {
-                it.value.value = propName.replace(ROLE_CODE_FLAG, '')
-              } else {
-                it.value.value = propName
-              }
+            const propName = item[key] as any
+            it.value.value = propName
+            if (key === 'pages') {
+              it.value.value = menus.map((page: PageByidRes) => page.pageId)
+            } else if (key === 'users') {
+              it.value.value = users.map((user: UserByRidRes) => user.userId)
+            } else if (item.isSystemReserved && it.disabled === false) {
+              it.disabled = true
             }
           })
         })
       }
-      function onDeleteItem(data: any) {
-        Modal.confirm({
-          title: '提示',
-          content: '是否要删除此角色？',
-          cancelText: '取消',
-          okText: '删除',
-          onOk: () => {
-            message.success('模拟角色删除成功，参数为' + JSON.stringify(data))
-          },
-        })
+      async function onDeleteItem(item: any) {
+        await deleteRoleApi(item.id)
+        doRefresh()
       }
-      function onDataFormConfirm() {
+      async function onDataFormConfirm() {
         if (formItems.every((it) => (it.validator ? it.validator() : true))) {
+          let option: Roles = {}
+          option = formItems.reduce((pre, cur) => {
+            ;(pre as any)[cur.key] = cur.value.value
+            return pre
+          }, {})
+          const { id, ...restRoles } = option as Roles
+          if (actionTitle.value === '添加角色') {
+            await addRoleApi(restRoles)
+          } else {
+            await updateRolesApi({ id, ...restRoles })
+          }
+
+          doRefresh()
           modalDialogRef.value?.toggle()
-          message.success(
-            '模拟菜单添加成功，参数为：' +
-              JSON.stringify(
-                formItems.reduce((pre, cur) => {
-                  ;(pre as any)[cur.key] = cur.value.value
-                  return pre
-                }, {})
-              )
-          )
         }
       }
-      function onShowMenu(item: any) {
-        post({
-          url: getMenuListByRoleId,
-          data: {
-            roleId: item.id,
-          },
-        })
-          .then((res) => {
-            menuData.length = 0
-            menuData.push(
-              ...handleMenuData(res.data, defaultCheckedKeys.value, defaultExpandedKeys.value)
-            )
-            menuModalDialogRef.value?.toggle()
-          })
-          .catch(console.log)
-      }
+
       function onMenuConfirm() {
         menuModalDialogRef.value?.close()
         message.success('提交成功: ' + JSON.stringify(defaultCheckedKeys.value))
       }
-      onMounted(doRefresh)
+      const checkNode = (key: string[], e: any) => {
+        console.log(e)
+      }
+
+      onMounted(() => {
+        doRefresh()
+        getUserList()
+      })
       return {
+        store,
         ROLE_CODE_FLAG,
         modalDialogRef,
         menuModalDialogRef,
@@ -276,10 +324,13 @@
         ...table,
         onAddItem,
         onDataFormConfirm,
-        onShowMenu,
         onDeleteItem,
         onUpdateItem,
         onMenuConfirm,
+        defaultExpandedUserKeys,
+        defaultCheckedUserKeys,
+        treeUsers,
+        checkNode,
       }
     },
   })

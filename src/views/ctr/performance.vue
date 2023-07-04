@@ -108,14 +108,12 @@
   //添加表格边框
   bordered.value = true
   const tableHeight = computed(async () => {
-    console.log(await useTableHeight(getCurrentInstance()))
-
     return await useTableHeight(getCurrentInstance())
   })
 
   const evaKey = useRowKey('MV')
   const evaClass = (record: object, index: number) => {
-    console.log(record, index)
+    // console.log(record, index)
   }
   const tableEvaluaColumns = useTableColumn(
     [

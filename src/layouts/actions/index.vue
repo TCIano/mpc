@@ -26,9 +26,9 @@
       <ExpandIcon v-if="!isFullscreen" />
       <ExitExpandIcon v-else />
     </span>
-    <span class="action-item" @click="onShowSetting">
+    <!-- <span class="action-item" @click="onShowSetting">
       <SettingIcon />
-    </span>
+    </span> -->
   </div>
 </template>
 

@@ -27561,7 +27561,7 @@ screen and (-ms-high-contrast: active) {
 }
 
 .dark .ant-table-pagination.ant-pagination {
-  margin: 16px 0;
+  margin: 16px 16px 16px 0;
 }
 
 .dark .ant-table-pagination {

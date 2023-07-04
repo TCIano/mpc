@@ -6,7 +6,7 @@
           <a-avatar shape="circle" :size="30" :src="userStore.avatar" />
         </div>
         <span class="nick-name">
-          {{ userStore.nickName }}
+          {{ userStore.userName }}
         </span>
         <CaretDownOutlined class="tip" />
       </div>
@@ -38,11 +38,11 @@
       const store = useLayoutStore()
       const userStore = useUserStore()
       const options = [
-        {
-          label: '个人中心',
-          key: 'personal-center',
-          icon: 'UserOutlined',
-        },
+        // {
+        //   label: '个人中心',
+        //   key: 'personal-center',
+        //   icon: 'UserOutlined',
+        // },
         {
           label: '退出登录',
           key: 'logout',

@@ -60,6 +60,10 @@ export interface StateType {
   theme: string
   sideBarBgColor: string
   pageAnim: string
+  waterMark: string
+  projectName: string
+  projectLogo: string
+  isOpenWaterMark: Boolean
   permissionRoutes: Array<RouteRecordRawWithHidden>
   visitedView: Array<RouteRecordRawWithHidden>
   cachedView: Array<string>
@@ -83,6 +87,8 @@ export interface StoreType extends CacheView, VisitedView {
   changeTheme: (theme: ThemeMode) => void
   changeSideBarBgColor: (colorName: SideTheme) => void
   changePageAnim: (pageAnim: string) => void
+  changePrjName: (prjName: string) => void
+  changeProjectLogo: (prjLogo: string) => void
   changePrimaryColor: (color: string) => void
   isShowHeader: () => boolean
   getSplitTabs: () => Array<RouteRecordRawWithHidden>

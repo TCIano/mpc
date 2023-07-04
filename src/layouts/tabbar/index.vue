@@ -23,7 +23,7 @@
             >
             <span v-else>
               {{ item.meta ? item.meta.title : item.name
-              }}{{ item.query?.title ? ' - ' + item.query?.title : '' }}
+              }}{{ item.query?.title ? ' - ' + decodeURIComponent(item.query.title) : '' }}
             </span>
             <span v-if="!item.meta?.affix" class="icon-item" @click.stop="iconClick(item.fullPath)">
               <CloseOutlined />

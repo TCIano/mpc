@@ -7,19 +7,19 @@
           <div class="img-wrapper">
             <img :src="ImageBg1" />
           </div>
-          <div class="content-wrapper">
+          <!-- <div class="content-wrapper">
             <div class="logo-wrapper">
               <img src="../../assets/logo.png" />
             </div>
-            <!-- <div class="title">中智达</div> -->
-            <!-- <div class="sub-title"> Vue3 + Vite2 + Typescript + Antd </div> -->
-          </div>
+            <div class="title">中智达</div>
+            <div class="sub-title"> </div>
+          </div> -->
         </div>
         <div class="login-wrapper">
-          <div class="change">
+          <!-- <div class="change">
             <PlusOutlined @click="onChange(false)" v-if="loginMode" class="icon" />
             <ArrowLeftOutlined @click="onChange(true)" v-else class="icon" />
-          </div>
+          </div> -->
           <div class="login" v-show="loginMode">
             <div class="title">账号登录</div>
             <a-input v-model:value="username" placeholder="请输入用户名/手机号" clearable>
@@ -48,13 +48,13 @@
                 <a>忘记密码？</a>
               </div>
             </div>
-            <a-divider>第三方登录</a-divider>
+            <!-- <a-divider>第三方登录</a-divider> -->
             <div class="mb-4 text-xl text-center" style="color: #007cff">
-              <a-space size="large">
+              <!-- <a-space size="large">
                 <AlipayOutlined />
                 <GithubOutlined />
                 <WechatOutlined />
-              </a-space>
+              </a-space> -->
             </div>
           </div>
           <div class="register" v-show="!loginMode">
@@ -114,8 +114,8 @@
   import { defineComponent, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import ImageBg1 from '@/assets/img_login_bg_01.jpg'
-  import { post, Response } from '@/api/http'
-  import { login } from '@/api/url'
+  import { post, get, Response } from '@/api/http'
+  import { loginApi } from '@/api/modules'
   import { UserState } from '@/store/types'
   import { message } from 'ant-design-vue'
   import {
@@ -157,32 +157,43 @@
       const registerConfirmPwd = ref('')
       const sendCodeTip = ref('发送验证码')
       let maxCount = 60
+      /**
+       *
+       * @param str 加密结果
+       */
+      const encode = (str: string) => {
+        let encode = encodeURI(str)
+        return btoa(encode)
+      }
       const onLogin = () => {
         loading.value = true
-        post({
-          url: login,
+        get({
+          url: loginApi,
           data: {
             username: username.value,
             password: password.value,
           },
         })
-          .then(({ data }: Response) => {
-            console.log(data)
-
-            userStore.saveUser(data as UserState).then(() => {
+          .then((data: UserState) => {
+            if (!data.result && data.hasOwnProperty('result')) return (loading.value = false)
+            userStore.saveUser(data).then(() => {
               router
                 .replace({
-                  path: route.query.redirect ? (route.query.redirect as string) : '/',
+                  /**
+                   * 可以配置首页路径
+                   */
+                  // path: route.query.redirect ? (route.query.redirect as string) : '/',
+                  path: data.redirectURL ?? '/',
                 })
                 .then(() => {
                   loading.value = false
-                  message.success('登录成功，欢迎：' + data.nickName)
+                  message.success('登录成功，欢迎：' + data.username)
                 })
             })
           })
           .catch((error) => {
             loading.value = false
-            message.error(error.message)
+            // message.error(error.message)
           })
       }
       const onRegister = () => {}
@@ -231,14 +242,20 @@
     position: relative;
     overflow: hidden;
     height: 100vh;
-    width: 100%;
+    width: 100vw;
+
     .login-bg-wrapper {
       position: absolute;
       top: 0;
-      left: 0;
+      right: 0;
       height: 100%;
       width: 100%;
-      background-color: #1890ff;
+      // background-color: #0f1b28;
+      background-image: url('../../assets/loginImg.jpg');
+      background-size: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      // background: 0f1b28 url('../../assets/loginImg.jpg') 100% center no-repeat;
       &::after {
         content: '';
         position: absolute;
@@ -247,24 +264,24 @@
         right: 0;
         bottom: 0;
         z-index: 2;
-        background-color: rgba(0, 0, 0, 0.3);
+        // background-color: rgba(0, 0, 0, 0.3);
       }
     }
     .form-container {
       position: absolute;
       width: 100%;
-      top: 0;
-      left: 0;
+      top: 120px;
+      right: 100px;
       display: flex;
       z-index: 9;
-      justify-content: center;
+      justify-content: flex-end;
       .form-wrapper {
         @media screen and (max-width: 996px) {
           width: 90%;
           margin-top: 5vh;
         }
         @media screen and (min-width: 996px) {
-          width: 45%;
+          width: 35%;
           margin-top: 20vh;
         }
         max-height: 80%;

@@ -11,7 +11,7 @@ import useGray from '../hooks/useGray'
 import useTheme from '../hooks/useTheme'
 import { SETTING_INFO_KEY } from '@/layouts/setting/keys'
 
-function presistSettingInfo(setting: any) {
+export function presistSettingInfo(setting: any) {
   localStorage.setItem(SETTING_INFO_KEY, JSON.stringify(setting))
 }
 
@@ -26,6 +26,10 @@ const originState = {
   theme: Setting.theme,
   sideBarBgColor: Setting.sideTheme,
   pageAnim: Setting.pageAnim,
+  waterMark: Setting.waterMark,
+  projectName: Setting.projectName,
+  projectLogo: Setting.projectLogo,
+  isOpenWaterMark: Setting.isOpenWaterMark,
   permissionRoutes: [],
   visitedView: [],
   cachedView: [],
@@ -64,6 +68,14 @@ const store = {
   },
   toggleCollapse(newStatus: boolean) {
     this.state.isCollapse = newStatus
+  },
+  changePrjName(newStatus: string) {
+    this.state.projectName = newStatus
+    presistSettingInfo(
+      Object.assign(Setting, {
+        projectName: newStatus,
+      })
+    )
   },
   toggleFixedNavBar(newStatus: boolean) {
     this.state.isFixedNavBar = newStatus
@@ -128,6 +140,10 @@ const store = {
       theme: Setting.theme,
       sideBarBgColor: Setting.sideTheme,
       pageAnim: Setting.pageAnim,
+      waterMark: Setting.waterMark,
+      projectName: Setting.projectName,
+      projectLogo: Setting.projectLogo,
+      isOpenWaterMark: Setting.isOpenWaterMark,
       permissionRoutes: [],
       visitedView: [],
       cachedView: [],
