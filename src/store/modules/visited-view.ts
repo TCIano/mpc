@@ -86,11 +86,7 @@ export default {
     return new Promise((resolve) => {
       ;(this as StoreType).state.visitedView = (this as StoreType).state.visitedView.filter(
         (it, index) => {
-          return (
-            !it.query ||
-            (it.query.title !== viewName && it.query.name !== viewName) ||
-            (it.params?.title !== viewName && it.params?.name !== viewName)
-          )
+          return !it.query || (it.query.title !== viewName && it.query.name !== viewName)
           //路由参数中既没有title为给定名称也没有name为给定名称的数据留存
         }
       )
