@@ -157,6 +157,7 @@
     getLogsApi,
     clearLogsApi,
   } from '@/api/modules'
+  import store from '@/store'
   import { PrjsRes } from '@/types/apis/ctr/prjs'
   import { getPrjNodeTreeApi } from '@/api/modules/ctr/nodes'
   import { NOTIFY_PRJ_ONLINE_DATAS_CHANGED } from '@/types/signalR'
@@ -164,6 +165,7 @@
   import useMpcStore from '@/store/modules/mpc'
   import dayjs from 'dayjs'
   const mpcStore = useMpcStore()
+
   interface signaRType {
     run: string
     load: string
@@ -363,6 +365,8 @@
     //重新加载页面
     const index = loadRes.value.findIndex((item: any) => item.name === name)
     loadRes.value.splice(index, 1)
+    //删除tab栏目相对应的此工程的在线页面以及趋势图页面
+    store.closePrjVisitedViewByName(name)
   }
   /**
    * 设置元素高度

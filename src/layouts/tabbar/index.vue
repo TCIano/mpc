@@ -254,6 +254,7 @@
       removeTab(fullPath: string) {
         const findItem = this.state.visitedView.find((it) => it.fullPath === fullPath)
         if (findItem) {
+          console.log(findItem)
           store.removeVisitedView(findItem as RouteRecordRawWithHidden).then(() => {
             if (this.currentTab === fullPath) {
               this.currentTab =

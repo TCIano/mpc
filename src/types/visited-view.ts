@@ -6,6 +6,7 @@ export default interface VisitedView {
   closeLeftVisitedView: (route: RouteRecordRawWithHidden) => Promise<RouteRecordRawWithHidden>
   closeRightVisitedView: (route: RouteRecordRawWithHidden) => Promise<RouteRecordRawWithHidden>
   closeAllVisitedView: () => Promise<void>
+  closePrjVisitedViewByName: (name: string) => Promise<void>
   persistentVisitedView: () => void
   restoreVisitedView: () => void
 }

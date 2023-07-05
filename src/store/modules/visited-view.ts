@@ -1,6 +1,7 @@
 import type { RouteRecordRawWithHidden } from './../../types/store'
 import type { StoreType } from '../../types/store'
 import VisitedView from '../../types/visited-view'
+import { isEmptyObject } from '@/utils/utils'
 
 const LOCAL_STOREAGE_VISITED_KEY = 'a-visited'
 
@@ -80,6 +81,25 @@ export default {
       }
     })
     localStorage.setItem(LOCAL_STOREAGE_VISITED_KEY, JSON.stringify(tempPersistendRoutes))
+  },
+  closePrjVisitedViewByName(viewName: string) {
+    return new Promise((resolve) => {
+      ;(this as StoreType).state.visitedView = (this as StoreType).state.visitedView.filter(
+        (it, index) => {
+          return (
+            !it.query ||
+            (it.query.title !== viewName && it.query.name !== viewName) ||
+            (it.params?.title !== viewName && it.params?.name !== viewName)
+          )
+          //路由参数中既没有title为给定名称也没有name为给定名称的数据留存
+        }
+      )
+      console.log(viewName, (this as StoreType).state.visitedView)
+
+      this.persistentVisitedView()
+      ;(this as StoreType).resetCachedView && (this as StoreType).resetCachedView()
+      resolve()
+    })
   },
   restoreVisitedView() {
     ;(this as StoreType).state.visitedView = [...(this as StoreType).state.visitedView]
