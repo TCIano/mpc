@@ -58,9 +58,11 @@
             >
               <template #bodyCell="{ column, record, index }">
                 <template v-if="column.key === 'name'">
-                  <a href="" @click.prevent="onToCtrOnline(record.name, record.serviceURL)">{{
-                    record.name
-                  }}</a>
+                  <a
+                    href=""
+                    @click.prevent="onToCtrOnline(record.name, record.serviceURL, record.state)"
+                    >{{ record.name }}</a
+                  >
                 </template>
                 <template v-if="column.key === 'time'">
                   {{ record.properties[0]?.value || '' }}
@@ -94,7 +96,7 @@
                     <div title="启动MPC在线监控">
                       <line-chart-outlined
                         class="text-lg cursor-pointer"
-                        @click="onToCtrOnline(record.name, record.serviceURL)"
+                        @click="onToCtrOnline(record.name, record.serviceURL, record.state)"
                       />
                     </div>
                   </a-space>
@@ -239,7 +241,7 @@
   const treeHeight = ref()
   const logList = ref<string[]>([])
   //按钮
-  const onButtonOption = async ({ name, type, fileURL }: PrjsRes, tag: string) => {
+  const onButtonOption = async ({ name, type, fileURL, state }: PrjsRes, tag: string) => {
     const options = { name, type }
     if (tag === 'run') {
       await runPrjApi(options)
@@ -251,20 +253,21 @@
       await reloadPrjApi(options)
       logList.value.push(name + '正在重新加载' + '--' + dayjs().format('YYYY-MM-DD HH:mm:ss'))
     }
-    // prjItem.value?.getPrjNodeTree()
     // getPrjs(Number(status.value))
+    prjItem.value?.reSetPrjState(name, state)
   }
   const signalRloadRes = (data: any) => {
-    console.log(data)
-
     const state = data.state
+    const name = data.name
+    prjItem.value?.reSetPrjState(name, state)
     const hasCurr = loadRes.value.some((item: any) => item.name === data.name)
+    prjItem.value?.reSetPrjState(name, state)
     if (state === 2 && !hasCurr) {
       loadRes.value.push({ ...data })
     } else if (state === 2 || state === 3) {
       loadRes.value.forEach((item: any) => {
         if (item.pid === data.pID) {
-          item.state = data.state
+          item.state = state
           item.desc = data.desc
           item.fileURL = data.fileURL
           item.fileName = data.fileName || ''
@@ -295,8 +298,6 @@
     signalR = new SignalR(CPM_HUB)
     // signalR.onMessageReceived(NOTIFY_PRJ_STATE_CHANGED, (res: string) => {
     //   const { data } = JSON.parse(res)
-    //   console.log('change')
-    //   signalRloadRes(data)
     // })
     signalR.onMessageReceived(
       NOTIFY_PRJ_OPERATION_RESULT,
@@ -324,7 +325,7 @@
     logList.value = []
   }
   //控制器在线
-  const onToCtrOnline = (name: string = '', serviceURL: any) => {
+  const onToCtrOnline = (name: string = '', serviceURL: any, state: number) => {
     router.push({
       name: 'CtrTpl',
       query: {
@@ -332,6 +333,7 @@
         name,
         type: 'online',
         serviceURL: encodeURIComponent(serviceURL),
+        state: state / 1,
       },
     })
   }
@@ -340,7 +342,7 @@
     getPrjs(Number(status.value))
   }
   //加载节点
-  const onLoadNode = async ({ name, type, fileURL }: any) => {
+  const onLoadNode = async ({ name, type, fileURL, state }: any) => {
     await loadPrjApi({
       name,
       type,
@@ -349,10 +351,9 @@
     logList.value.push(name + '正在加载...' + '--' + dayjs().format('YYYY-MM-DD HH:mm:ss'))
     //重新加载页面
     // await getPrjs(Number(status.value))
-    // prjItem.value?.getPrjNodeTree()
   }
   //卸载节点
-  const onUnLoadNode = async ({ name, type, fileURL }: any) => {
+  const onUnLoadNode = async ({ name, type, fileURL, state }: any) => {
     await unloadPrjApi({
       name,
       type,

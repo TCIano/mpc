@@ -44,13 +44,13 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onBeforeUnmount, HTMLAttributes, getCurrentInstance } from 'vue'
+  import { ref, onMounted, onBeforeUnmount, getCurrentInstance } from 'vue'
   import TreeMenuLayout from '@/layouts/TreeMenuLayout.vue'
-  import { debounce } from '@/utils/utils'
+  import { debounce, isEmptyObject } from '@/utils/utils'
   import { CPM_HUB, getTrendUnitsApi } from '@/api/modules'
   import { useRoute } from 'vue-router'
   import SignalR from '@/utils/signalR'
-  import type { TreeProps } from 'ant-design-vue'
+  import { message, type TreeProps } from 'ant-design-vue'
   import { NOTIFY_TREND_DATAS_CHANGED, SignalrCls } from '@/types/signalR'
   import { AntTreeNodeSelectedEvent } from 'ant-design-vue/es/tree'
   import { chartOption } from '@/types/echarts'
@@ -103,7 +103,6 @@
     signalR = new SignalR() as SignalrCls
     signalR.onMessageReceived(NOTIFY_TREND_DATAS_CHANGED, (res: string) => {
       const trend: signalRTrendDatas = JSON.parse(res)
-      console.log(trend)
       if (trend.result) {
         const baseTime = trend.data.baseTime
         const period = trend.data.period
@@ -126,29 +125,28 @@
                         dayjs(baseTime).subtract(index, 's').format('YYYY-MM-DD HH:mm:ss')
                       )
                     }
-                    return [currBeforTime.reverse()[i], newL]
+                    return [currBeforTime.reverse()[i] || '', newL]
                   } else {
-                    for (let index = 0; index < line.datas.length * period; index += period) {
+                    for (let index = 0; index < currLine.Datas.length * period; index += period) {
                       currafterTime.push(
                         dayjs(baseTime).add(index, 's').format('YYYY-MM-DD HH:mm:ss')
                       )
                     }
-                    return [currafterTime[i], newL]
+                    return [currafterTime[i] || '', newL]
                   }
                 })
-
                 return { ...line, datas: currData }
               }) || [],
           }
         })
-        setAllTrendValue(filterTrend)
+        // setAllTrendValue(filterTrend)
         forDataList(filterTrend, baseTime)
       }
     })
   }
   const forDataList = (filterTrend: any, time: string) => {
     dataList.value.forEach((item: any, i: number) => {
-      const isHasOccupy = filterTrend.find((t) => t.fullName === item.title.text)
+      const isHasOccupy = filterTrend.find((t: any) => t.fullName === item?.title?.text) //可选连必须加，因为刚开始每一项是空的
       if (isHasOccupy) {
         let option = {
           title: {
@@ -159,7 +157,7 @@
           },
           legend: {
             top: '10%',
-            data: isHasOccupy.lines?.map((item) => item.name),
+            data: isHasOccupy.lines?.map((item: any) => item.name),
           },
           grid: {
             top: '25%',
@@ -201,8 +199,8 @@
           }),
         }
         dataList.value[i] = option
+        reSizeDataChunks()
       }
-      reSizeDataChunks()
     })
   }
   let trendSizeOptions: any[] = []
@@ -213,7 +211,7 @@
   const prjName = route.query.title || ''
   const row = ref(2) //行数
   const col = ref(2) //列数
-  const dataList = ref<any>([
+  let dataList = ref<any>([
     /* ...100个元素 */
   ])
   const dataChunks = ref<any[]>([])
@@ -226,9 +224,20 @@
         })
       }
     }
-    for (let index = 0; index < row.value * col.value; index++) {
-      dataList.value.push({})
+    const newDataList = new Array(row.value * col.value).fill({})
+    for (let index = 0; index < newDataList.length; index++) {
+      if (newDataList.length > dataList.value.length) {
+        newDataList[index] = dataList.value[index]
+      } else {
+        const mapDataList = dataList.value.filter((item: any) => item?.title?.text)
+        newDataList[index] = mapDataList[index]
+      }
     }
+    dataList.value = newDataList
+    // 清除实例
+    dataList.value.forEach((item: any, i: number) => {
+      item === 'undefined' && chart.value[i].disposeDom()
+    })
     reSizeDataChunks()
   }
   const borderStyle = ref<{
@@ -249,18 +258,18 @@
       dataChunks.value.push(dataList.value.slice(i, col.value + i))
     }
   }
-  mapSize()
   const reSetValue = () => {
     trendSizeOptions = []
-    dataList.value = []
+    // dataList.value = []
   }
   //添加趋势
   const onAddTrend = () => {
+    if (isEmptyObject(option.value)) return message.warning('请选择模型')
     const x = borderStyle.value.x!
     const y = borderStyle.value.y!
     const index = x === null || y === null ? '' : !x ? y : x * col.value + y
     dataList.value.splice(
-      index !== '' ? index : dataList.value.findIndex((item: chartOption) => !item.title),
+      index !== '' ? index : dataList.value.findIndex((item: chartOption) => !item?.title),
       1,
       option.value
     )
@@ -270,6 +279,7 @@
       x: null,
       y: null,
     }
+    option.value = {}
   }
   const onDeleteTrend = () => {
     const x = borderStyle.value.x!
@@ -363,14 +373,13 @@
           itemStyle: {
             color: 'rgba' + item.color,
           },
-          // markLine: {
-          //   // symbol: 'none',
-          //   data: [{ xAxis: dayjs().format('YYYY-MM-DD HH:mm:ss') }],
-          //   lineStyle: {
-          //     color: '#999',
-          //     type: 'dashed',
-          //   },
-          // },
+          markLine: {
+            data: [{ xAxis: dayjs().format('YYYY-MM-DD HH:mm:ss') }],
+            lineStyle: {
+              color: '#999',
+              type: 'dashed',
+            },
+          },
           smooth: true,
         }
       }),
@@ -385,23 +394,22 @@
   const style = ref()
   const containHeight = ref()
   const setChartWidHei = () => {
-    let mainPadd = 50 //cardbody-padding
+    let mainPadd = 48 //cardbody-padding
     let mainCon = document.querySelector('.main-section') as Element
-    let treeMenuW = ((mainCon?.getBoundingClientRect().width - mainPadd * 2) / 24) * 5
-    containWidth.value = mainCon?.getBoundingClientRect().width - treeMenuW - mainPadd * 2
+    let treeMenuW = (mainCon?.getBoundingClientRect().width / 24) * 4
+    containWidth.value = mainCon?.getBoundingClientRect().width - treeMenuW - mainPadd * 1.5
     style.value = {
       width: containWidth.value / col.value + 'px',
-      height: containHeight.value / row.value + 'px',
+      height: (containHeight.value - mainPadd) / row.value + 'px',
     }
   }
   const setChartWidHeiDeb: any = debounce(setChartWidHei)
-
   window.addEventListener('resize', setChartWidHeiDeb)
   setChartWidHeiDeb()
 
   onMounted(async () => {
     containHeight.value = await useTableHeight(getCurrentInstance())
-    console.log(containHeight.value)
+    mapSize()
 
     getAllTrend()
     getTrendRealTimeData()

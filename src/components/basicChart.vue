@@ -48,7 +48,6 @@
   watch(
     () => props.option,
     (value) => {
-      console.log(value)
       if (echartInstance) {
         echartInstance.setOption(value)
       } else {
@@ -60,7 +59,6 @@
   let echartInstance: any = null
   let timer: any = null
   const init = () => {
-    echartInstance && dispose(comChart.value as HTMLElement)
     //高度超过60才生成实例，小于60像素其实看到不到东西浪费性能
     echartInstance = useEcharts(comChart.value as HTMLDivElement)
     echartInstance.on('finished', () => {
@@ -74,6 +72,7 @@
   }
   const disposeDom = () => {
     echartInstance && dispose(comChart.value as HTMLElement)
+    echartInstance = null
   }
   defineExpose({ disposeDom })
 

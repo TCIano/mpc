@@ -65,23 +65,13 @@
                 </template>
                 IOServer
               </a-button>
-              <a-button
-                size="small"
-                @click="onRunOnline"
-                :loading="btnLoading"
-                v-if="type && prjState === 2"
-              >
+              <a-button size="small" @click="onRunOnline" v-if="type && prjState !== 3">
                 <template #icon>
                   <play-circle-outlined />
                 </template>
                 运行
               </a-button>
-              <a-button
-                size="small"
-                @click="onStopOnline"
-                :loading="btnLoading"
-                v-if="type && prjState === 3"
-              >
+              <a-button size="small" @click="onStopOnline" v-if="type && prjState === 3">
                 <template #icon>
                   <pause-outlined />
                 </template>
@@ -178,7 +168,12 @@
   import { ModalDialogType } from '@/types/components'
   import SignalR from '@/utils/signalR'
   import useMpcStore from '@/store/modules/mpc'
-  import { NOTIFY_PRJ_ONLINE_DATAS_CHANGED, NOTIFY_PRJ_OVERVIEW, SignalrCls } from '@/types/signalR'
+  import {
+    NOTIFY_PRJ_ONLINE_DATAS_CHANGED,
+    NOTIFY_PRJ_OVERVIEW,
+    NOTIFY_PRJ_STATE_CHANGED,
+    SignalrCls,
+  } from '@/types/signalR'
   const basicTable = defineAsyncComponent(() => import('./components/basic-table.vue'))
   const allModel = defineAsyncComponent(() => import('./components/all-model.vue'))
   const route = useRoute()
@@ -191,7 +186,7 @@
   const ioServerModal = ref<ModalDialogType>()
   const currentMenu = ref<string[]>([CtrParamsConst.CTR_OVERVIEW])
   let signalR: SignalrCls | null = null
-  let btnLoading = ref<Boolean>(false)
+  const btnLoading = ref<Boolean>(false)
   //组件名要和菜单名称一致
   const componentMap: any = {
     [CtrParamsConst.CTR_OVERVIEW]: defineAsyncComponent(() => import('./components/over-view.vue')),
@@ -207,7 +202,6 @@
   const currProles = ref<any>()
   let prjTotalData = ref<PrjTotalData>()
   let type: any = ref(route.query.type as string)
-  console.log(type.value)
 
   const menuMap = ref([
     {
@@ -253,16 +247,26 @@
   ])
 
   const prjState = ref<number>(3)
-  watch(prjState, (value) => {
-    btnLoading.value = false
-  })
+
   const onChnageRole = (value: string) => {
     ctr.value.handleRolesVar(value)
+  }
+  //在线状态
+  const signalRState = () => {
+    signalR?.onMessageReceived(NOTIFY_PRJ_STATE_CHANGED, (res: string) => {
+      const signalrPrj = JSON.parse(res)
+      if (signalrPrj.result) {
+        prjState.value = signalrPrj.data.State
+      } else {
+        message.warning('操作失败')
+      }
+    })
   }
   //在线推送总览
   const signalROverView = async () => {
     mpcStore.saveUrl(decodeURIComponent(serverUrl))
     signalR = new SignalR()
+
     signalR.onMessageReceived(NOTIFY_PRJ_ONLINE_DATAS_CHANGED, (res: string) => {
       const jsonRes: signalROnlineDatasChanged = JSON.parse(res)
       if (jsonRes.result) {
@@ -414,6 +418,10 @@
       serverUrl = value.serviceURL as string
       type.value = value.type
       value.name && refreshVar()
+      prjState.value = !value.state ? 0 : (value.state as any) / 1
+    },
+    {
+      immediate: true,
     }
   )
   watch(
@@ -422,6 +430,7 @@
       refreshVar()
     }
   )
+
   const currentCptData = computed(() => {
     if (prjTotalData.value) {
       const data = cloneDeep(prjTotalData.value)
@@ -459,14 +468,14 @@
   }
   //运行在线工程
   const onRunOnline = async () => {
+    signalRState()
     await runOnlinePrj(route.query.name as string)
     message.success('正在运行...')
-    btnLoading.value = true
   }
   const onStopOnline = async () => {
+    signalRState()
     await stopOnlinePrj(route.query.name as string)
     message.success('正在停止...')
-    btnLoading.value = true
   }
   const onCheckModel = async () => {
     const res = await getCheckResultApi(route.query.name as string)

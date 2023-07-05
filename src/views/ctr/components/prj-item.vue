@@ -129,9 +129,7 @@
   const expandedKeys = ref<(string | null)[]>([])
   const treeHeight = ref()
   const autoExpandParent = ref<boolean>(true)
-  const getArg = (aarg: any) => {
-    console.log(aarg)
-  }
+
   const useFormState = () => ({
     name: '',
   })
@@ -162,8 +160,6 @@
     drawerDialog.value?.toggle()
   }
   const onDeleteNode = async (dataRef: any) => {
-    console.log(dataRef)
-
     await deleteNodeApi(dataRef.id)
     message.success('删除' + dataRef.name + '成功')
     getPrjNodeTree()
@@ -265,7 +261,6 @@
     dInfo: AntTreeNodeDropEvent & TreeNodes & AntTreeNodeDragEnterEvent
   ) => {
     try {
-      console.log(dInfo)
       let dstNodeId = ''
       let srcPrjNames = [] as string[]
       const dropNode = dInfo.dragNode
@@ -314,8 +309,24 @@
     tree.value = handleNode(res as TreeNodes[])
     generateList(tree.value)
   }
+  //修改节点状态
+  function updateNodeValue(node: any, name: string, newValue: number, prop: string) {
+    if (node.name === name) {
+      node[prop] = newValue
+    }
+    if (node.children) {
+      node.children.forEach((child: any) => updateNodeValue(child, name, newValue, prop))
+    }
+  }
+  //修改节点状态
+  const reSetPrjState = (name: string, state: number) => {
+    tree.value!.forEach((element) => {
+      updateNodeValue(element, name, state, 'state')
+    })
+  }
   defineExpose({
     getPrjNodeTree,
+    reSetPrjState,
   })
   onMounted(() => {
     treeHeight.value = document.querySelector('.main-section')?.getBoundingClientRect().height

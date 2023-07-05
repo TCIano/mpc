@@ -95,3 +95,11 @@ export const handleVarColor = (text: string) => {
     return varColor.other
   }
 }
+/**
+ *判断是否为空对象
+ * @param obj Object
+ * @returns
+ */
+export function isEmptyObject(obj: object) {
+  return Object.keys(obj).length === 0
+}
