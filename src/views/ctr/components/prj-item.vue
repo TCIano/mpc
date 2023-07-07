@@ -2,10 +2,16 @@
   <div>
     <div class="flex">
       <a-input-search placeholder="搜索" v-model:value="searchText" size="small" />
-      <div class="flex justify-center align-bottom">
+      <div class="flex align-bottom">
         <plus-outlined
+          title="添加工程"
           class="text-lg cursor-pointer height hover:bg-blue-300"
           @click="onAddGroup"
+        />
+        <file-sync-outlined
+          title="刷新工程"
+          class="text-lg cursor-pointer height hover:bg-blue-300"
+          @click="onFreshPrj"
         />
       </div>
     </div>
@@ -303,9 +309,13 @@
     }
     return res
   }
+  const onFreshPrj = () => {
+    getPrjNodeTree(true)
+    message.success('工程更新成功')
+  }
   // 获取所有工程
-  const getPrjNodeTree = async () => {
-    const res = await getPrjNodeTreeApi()
+  const getPrjNodeTree = async (reload?: boolean) => {
+    const res = await getPrjNodeTreeApi(reload)
     tree.value = handleNode(res as TreeNodes[])
     generateList(tree.value)
   }

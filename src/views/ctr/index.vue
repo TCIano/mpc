@@ -1,6 +1,6 @@
 <template>
   <div class="ctr__inner">
-    <a-row>
+    <a-row type="flex">
       <a-col :md="5">
         <a-card
           :style="{ height: treeHeight + 'px', minWidth: '220px' }"
@@ -228,8 +228,9 @@
       key: 'time',
       dataIndex: 'time',
       width: 200,
+      defaultSortOrder: 'descend',
       sorter: {
-        compare: (a: any, b: any) => dayjs(a.fileTime).unix() - dayjs(b.fileTime).unix(),
+        compare: (a: any, b: any) => dayjs(a.time).unix() - dayjs(b.time).unix(),
       },
     },
     {
