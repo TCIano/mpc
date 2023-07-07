@@ -1,127 +1,131 @@
 <template>
-  <a-row :gutter="5">
-    <a-col :md="5" :sm="9" :xs="11">
-      <a-card
-        :style="{ height: treeHeight + 'px' }"
-        :bodyStyle="{ padding: '5px' }"
-        :headerStyle="{ padding: '5px' }"
-      >
-        <prj-item
-          ref="prjItem"
-          @on-load-node="onLoadNode"
-          @on-un-load-node="onUnLoadNode"
-        ></prj-item>
-      </a-card>
-    </a-col>
-    <a-col :md="19" :sm="15" :xs="13">
-      <!-- <div class="right-top-title" ref="topV">
-        <a-row :gutter="[10, 10]">
-          <a-col :md="8" :sm="12" :xs="24" v-for="item in 3">
-            <div
-              class="flex items-center justify-between w-full h-28 pl-7 pr-7 bg-gradient-to-r from-blue-200 to-blue-400"
-            >
-              <div class="flex-wrap justify-items-center">
-                <div class="mb-1 text-lg font-thin text-white">工程总数</div>
-                <div class="text-2xl font-medium text-white">4</div>
-              </div>
-              <div class="w-12 h-12 bg-black"></div>
-            </div>
-          </a-col>
-        </a-row>
-      </div> -->
-      <a-row :gutter="5">
-        <a-col :md="19" :sm="15" :xs="13">
-          <table-header ref="tableHeaderRef">
-            <template #top-left>
-              <a-radio-group v-model:value="status" @change="onSelectState" size="small">
-                <a-radio-button v-for="item in stateMap" :key="item.key" :value="item.key"
-                  >{{ item.name }}({{ item.value }})</a-radio-button
-                >
-              </a-radio-group>
-            </template>
-            <template #top-right>
-              <a-button type="primary" size="small" @click="clearLogs">清除日志</a-button>
-            </template>
-          </table-header>
-          <table-body ref="tableBody">
-            <!-- <div class="auto-scroll" :style="{ height: cardGridHei + 'px', padding: '5px' }">
-              <cardItem />
-            </div> -->
-            <a-table
-              :loading="tableLoading"
-              :data-source="tableData"
-              :columns="tableColumns"
-              :pagination="true"
-              :bordered="true"
-              :rowKey="rowKey"
-              :scroll="{ y: tableHeight, x: 'max-content' }"
-            >
-              <template #bodyCell="{ column, record, index }">
-                <template v-if="column.key === 'name'">
-                  <a
-                    href=""
-                    @click.prevent="onToCtrOnline(record.name, record.serviceURL, record.state)"
-                    >{{ record.name }}</a
+  <div class="ctr__inner">
+    <a-row>
+      <a-col :md="5">
+        <a-card
+          :style="{ height: treeHeight + 'px', minWidth: '220px' }"
+          :bodyStyle="{ padding: '5px' }"
+          :headerStyle="{ padding: '5px' }"
+        >
+          <prj-item
+            ref="prjItem"
+            @on-load-node="onLoadNode"
+            @on-un-load-node="onUnLoadNode"
+          ></prj-item>
+        </a-card>
+      </a-col>
+      <a-col :md="19">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <table-header ref="tableHeaderRef">
+              <template #top-left>
+                <a-radio-group v-model:value="status" @change="onSelectState" size="small">
+                  <a-radio-button v-for="item in stateMap" :key="item.key" :value="item.key"
+                    >{{ item.name }}({{ item.value }})</a-radio-button
                   >
-                </template>
-                <template v-if="column.key === 'time'">
-                  {{ record.properties[0]?.value || '' }}
-                </template>
-                <template v-if="column.key === 'actions'">
-                  <a-space size="middle">
-                    <div title="运行" v-if="record.state === 2">
-                      <play-circle-outlined
-                        class="text-lg cursor-pointer"
-                        @click="onButtonOption(record, 'run')"
-                      />
-                    </div>
-                    <div title="停止" v-if="record.state === 3">
-                      <pause-circle-outlined
-                        class="text-lg cursor-pointer"
-                        @click="onButtonOption(record, 'stop')"
-                      />
-                    </div>
-                    <div title="卸载">
-                      <poweroff-outlined
-                        class="text-lg cursor-pointer"
-                        @click="() => onUnLoadNode(record)"
-                      />
-                    </div>
-                    <div title="重新加载">
-                      <reload-outlined
-                        class="text-lg cursor-pointer"
-                        @click="onButtonOption(record, 'reload')"
-                      />
-                    </div>
-                    <div title="启动MPC在线监控">
-                      <line-chart-outlined
-                        class="text-lg cursor-pointer"
-                        @click="onToCtrOnline(record.name, record.serviceURL, record.state)"
-                      />
-                    </div>
-                  </a-space>
-                </template>
+                </a-radio-group>
               </template>
-            </a-table>
-          </table-body>
-          <!-- <table-footer ref="tableFooterRef"></table-footer> -->
-        </a-col>
-        <a-col :md="5" :sm="9" :xs="11">
-          <a-card
-            class="auto-scroll"
-            :style="{ height: treeHeight + 'px' }"
-            :bodyStyle="{ padding: '10px' }"
-            :headerStyle="{ padding: '5px' }"
-          >
-            <div v-for="(item, i) in logList" :key="i">
-              <span>{{ item }}</span>
-              <!-- <a-divider /> -->
-            </div>
-          </a-card>
-        </a-col>
-      </a-row>
-    </a-col>
-  </a-row>
+              <template #top-right>
+                <a-button type="primary" size="small" @click="clearLogs">清除日志</a-button>
+              </template>
+            </table-header>
+            <table-body ref="tableBody">
+              <a-table
+                :loading="tableLoading"
+                :data-source="tableData"
+                :columns="tableColumns"
+                :pagination="true"
+                :bordered="true"
+                :rowKey="rowKey"
+                :scroll="{ y: tableHeight - 290, x: 930 }"
+              >
+                <template #bodyCell="{ column, record, index }">
+                  <template v-if="column.key === 'name'">
+                    <a
+                      href=""
+                      @click.prevent="onToCtrOnline(record.name, record.serviceURL, record.state)"
+                      >{{ record.name }}</a
+                    >
+                  </template>
+                  <template v-if="column.key === 'type'">
+                    <a-tag size="small" :color="prjsTypeColor[record.type as PrjsType]">
+                      {{ record.type }}
+                    </a-tag>
+                  </template>
+                  <template v-if="column.key === 'state'">
+                    <a-tag size="small" :color="record.state === 2 ? 'error' : 'success'">
+                      {{ record.state === 2 ? '已加载' : '正在运行' }}
+                    </a-tag>
+                  </template>
+                  <template v-if="column.key === 'time'">
+                    {{ record.properties[0]?.value || '' }}
+                  </template>
+                  <template v-if="column.key === 'actions'">
+                    <a-space size="large">
+                      <div title="运行" v-if="record.state === 2">
+                        <caret-right-outlined
+                          class="text-xl cursor-pointer"
+                          @click="onButtonOption(record, 'run')"
+                        />
+                      </div>
+                      <div title="停止" v-if="record.state === 3">
+                        <pause-outlined
+                          class="text-xl cursor-pointer"
+                          @click="onButtonOption(record, 'stop')"
+                        />
+                      </div>
+                      <div title="卸载">
+                        <poweroff-outlined
+                          class="text-xl cursor-pointer"
+                          @click="() => onUnLoadNode(record)"
+                        />
+                      </div>
+                      <div title="重新加载">
+                        <reload-outlined
+                          class="text-xl cursor-pointer"
+                          @click="onButtonOption(record, 'reload')"
+                        />
+                      </div>
+                      <div title="启动MPC在线监控">
+                        <line-chart-outlined
+                          class="text-xl cursor-pointer"
+                          @click="onToCtrOnline(record.name, record.serviceURL, record.state)"
+                        />
+                      </div>
+                    </a-space>
+                  </template>
+                </template>
+              </a-table>
+            </table-body>
+            <!-- <table-footer ref="tableFooterRef"></table-footer> -->
+          </div>
+          <div class="ctr-table">
+            <a-dropdown :trigger="['contextmenu']">
+              <a-card hoverable :style="{ height: '210px' }" :bodyStyle="{ padding: '0px' }">
+                <a-table
+                  :columns="logColumns"
+                  :pagination="false"
+                  size="small"
+                  :data-source="logList"
+                  :scroll="{ y: 170 }"
+                >
+                </a-table>
+              </a-card>
+              <template #overlay>
+                <a-menu @click="clearLogs">
+                  <a-menu-item key="clearLog">
+                    <clear-outlined />
+                    <a-divider type="vertical" />
+                    清除日志</a-menu-item
+                  >
+                </a-menu>
+              </template>
+            </a-dropdown>
+          </div>
+        </div>
+      </a-col>
+    </a-row>
+  </div>
 </template>
 
 <script setup lang="ts" name="Personal">
@@ -131,20 +135,11 @@
     getCurrentInstance,
     ComponentInternalInstance,
     onBeforeUnmount,
-    onUpdated,
-    watch,
-    reactive,
-    nextTick,
   } from 'vue'
-  import { MPC_HUB, CPM_HUB } from '@/api/modules'
+  import { CPM_HUB } from '@/api/modules'
   import { useRouter } from 'vue-router'
-  import { usePagination, useRowKey, useTable, useTableHeight, useTableColumn } from '@/hooks/table'
-  import { debounce } from '@/utils/utils'
-  import {
-    SignalrCls,
-    NOTIFY_PRJ_OPERATION_RESULT,
-    NOTIFY_PRJ_STATE_CHANGED,
-  } from '@/types/signalR'
+  import { useRowKey, useTable, useTableHeight, useTableColumn } from '@/hooks/table'
+  import { SignalrCls, NOTIFY_PRJ_OPERATION_RESULT } from '@/types/signalR'
   import SignalR from '@/utils/signalR'
   import PrjItem from './components/prj-item.vue'
   import {
@@ -154,14 +149,9 @@
     runPrjApi,
     stopPrjApi,
     unloadPrjApi,
-    getLogsApi,
-    clearLogsApi,
   } from '@/api/modules'
   import store from '@/store'
-  import { PrjsRes } from '@/types/apis/ctr/prjs'
-  import { getPrjNodeTreeApi } from '@/api/modules/ctr/nodes'
-  import { NOTIFY_PRJ_ONLINE_DATAS_CHANGED } from '@/types/signalR'
-  import { NOTIFY_PRJ_OVERVIEW } from '@/types/signalR'
+  import { PrjsRes, prjsTypeColor, PrjsType } from '@/types/apis/ctr/prjs'
   import useMpcStore from '@/store/modules/mpc'
   import dayjs from 'dayjs'
   const mpcStore = useMpcStore()
@@ -203,34 +193,53 @@
         title: '控制器名称',
         key: 'name',
         dataIndex: 'name',
+        width: 180,
+        ellipsis: true,
       },
       {
-        title: '描述',
-        key: 'desc',
-        dataIndex: 'desc',
+        title: '工程类型',
+        key: 'type',
+        dataIndex: 'type',
+        width: 120,
       },
       {
-        title: '文件地址',
-        key: 'fileURL',
-        dataIndex: 'fileURL',
+        title: '状态',
+        key: 'state',
+        dataIndex: 'state',
+        width: 120,
       },
       {
         title: '最后一次运行时间',
         key: 'time',
-        // dataIndex: 'fileURL',
       },
       {
         title: '操作',
         key: 'actions',
-        width: 150,
+        width: 280,
       },
     ],
     {
       align: 'center',
     }
   )
+  const logColumns = useTableColumn([
+    {
+      title: '时间',
+      key: 'time',
+      dataIndex: 'time',
+      width: 200,
+      sorter: {
+        compare: (a: any, b: any) => dayjs(a.fileTime).unix() - dayjs(b.fileTime).unix(),
+      },
+    },
+    {
+      title: '事件',
+      key: 'event',
+      dataIndex: 'event',
+    },
+  ])
   const loadRes: any = ref([])
-
+  const currentTime = () => dayjs().format('YYYY-MM-DD HH:mm:ss')
   let signalR: SignalrCls
   const signaRType: signaRType = {
     run: '运行成功',
@@ -241,19 +250,28 @@
   }
   const status = ref<number>(5)
   const treeHeight = ref()
-  const logList = ref<string[]>([])
+  const logList = ref<{ time: string; event: string }[]>([])
   //按钮
   const onButtonOption = async ({ name, type, fileURL, state }: PrjsRes, tag: string) => {
     const options = { name, type }
     if (tag === 'run') {
       await runPrjApi(options)
-      logList.value.push(name + '正在加载' + '--' + dayjs().format('YYYY-MM-DD HH:mm:ss'))
+      logList.value.push({
+        time: currentTime(),
+        event: name + '正在加载',
+      })
     } else if (tag === 'stop') {
       await stopPrjApi(options)
-      logList.value.push(name + '正在停止' + '--' + dayjs().format('YYYY-MM-DD HH:mm:ss'))
+      logList.value.push({
+        time: currentTime(),
+        event: name + '正在停止',
+      })
     } else if (tag === 'reload') {
       await reloadPrjApi(options)
-      logList.value.push(name + '正在重新加载' + '--' + dayjs().format('YYYY-MM-DD HH:mm:ss'))
+      logList.value.push({
+        time: currentTime(),
+        event: name + '正在重新加载',
+      })
     }
     // getPrjs(Number(status.value))
     prjItem.value?.reSetPrjState(name, state)
@@ -307,14 +325,16 @@
         const { data, result, errMsg } = JSON.parse(res)
         if (result) {
           signalRloadRes(convertKeysToLower(data))
-          logList.value.push(
-            data.Name + ' : ' + signaRType[type] + '--' + dayjs().format('YYYY-MM-DD HH:mm:ss')
-          )
+          logList.value.push({
+            time: currentTime(),
+            event: data.Name + ' : ' + signaRType[type],
+          })
           handleState(loadRes.value, 5)
         } else {
-          logList.value.push(
-            data.Name + ' : ' + errMsg + '--' + dayjs().format('YYYY-MM-DD HH:mm:ss')
-          )
+          logList.value.push({
+            time: currentTime(),
+            event: data.Name + ' : ' + errMsg,
+          })
         }
       }
     )
@@ -350,7 +370,10 @@
       type,
       fileURL,
     })
-    logList.value.push(name + '正在加载...' + '--' + dayjs().format('YYYY-MM-DD HH:mm:ss'))
+    logList.value.push({
+      time: currentTime(),
+      event: name + '正在加载...',
+    })
     //重新加载页面
     // await getPrjs(Number(status.value))
   }
@@ -361,7 +384,10 @@
       type,
       fileURL,
     })
-    logList.value.push(name + '正在卸载...' + '--' + dayjs().format('YYYY-MM-DD HH:mm:ss'))
+    logList.value.push({
+      time: currentTime(),
+      event: name + '正在卸载...',
+    })
     //重新加载页面
     const index = loadRes.value.findIndex((item: any) => item.name === name)
     loadRes.value.splice(index, 1)
@@ -406,13 +432,17 @@
 </script>
 
 <style scoped lang="less">
-  .ball {
-    width: 20px;
-    height: 20px;
-    display: block;
-    background: black;
-    border-radius: 50%;
-    margin: 0;
-    background: radial-gradient(circle at 100px 100px, #d0eccc, #6be7a3);
+  .ctr__inner {
+    min-width: 1070px;
+
+    .ball {
+      width: 20px;
+      height: 20px;
+      display: block;
+      background: black;
+      border-radius: 50%;
+      margin: 0;
+      background: radial-gradient(circle at 100px 100px, #d0eccc, #6be7a3);
+    }
   }
 </style>

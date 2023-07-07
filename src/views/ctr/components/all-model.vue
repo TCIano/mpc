@@ -224,7 +224,10 @@
         })
       }
     }
+
     const newDataList = new Array(row.value * col.value).fill({})
+    console.log(newDataList)
+
     for (let index = 0; index < newDataList.length; index++) {
       if (newDataList.length > dataList.value.length) {
         newDataList[index] = dataList.value[index]
@@ -233,11 +236,15 @@
         newDataList[index] = mapDataList[index]
       }
     }
+
     dataList.value = newDataList
+    /**
+     * youwenti!!!!
+     */
     // 清除实例
-    dataList.value.forEach((item: any, i: number) => {
-      item === 'undefined' && chart.value[i].disposeDom()
-    })
+    // dataList.value.forEach((item: any, i: number) => {
+    //   chart.value && chart.value[i]?.disposeDom()
+    // })
     reSizeDataChunks()
   }
   const borderStyle = ref<{
@@ -394,7 +401,7 @@
   const style = ref()
   const containHeight = ref()
   const setChartWidHei = () => {
-    let mainPadd = 48 //cardbody-padding
+    let mainPadd = 50 //cardbody-padding
     let mainCon = document.querySelector('.main-section') as Element
     let treeMenuW = (mainCon?.getBoundingClientRect().width / 24) * 4
     containWidth.value = mainCon?.getBoundingClientRect().width - treeMenuW - mainPadd * 1.5

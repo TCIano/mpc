@@ -86,7 +86,7 @@
   }
   .vaw-side-bar-wrapper {
     position: fixed;
-    top: 0;
+    top: 5px;
     left: 0;
     overflow-x: hidden;
     height: 100%;

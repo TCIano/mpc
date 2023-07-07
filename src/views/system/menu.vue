@@ -154,7 +154,7 @@
           },
         ],
         {
-          align: 'center',
+          ellipsis: true,
         }
       )
       const itemFormOptions = [

@@ -12,9 +12,12 @@ const REMOVE = BASE + '/MovePrjs'
 const UPDATE = BASE + '/Update'
 const DELETE = BASE + '/Delete'
 
-export const getPrjNodeTreeApi = () => {
+export const getPrjNodeTreeApi = (reload: boolean = false) => {
   return get({
     url: GET_PRJ_NODE_TREE,
+    data: {
+      reload,
+    },
     // url: '/MPC/GetMPCPrj?fileURL=F%3A%5C%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE%5CMPC10.0%5Ctest2.cf',
   })
 }

@@ -3,7 +3,6 @@ export interface HandlePrj {
   type: PrjsType
   fileURL?: string
 }
-type PrjsType = 'node' | 'mpc' | 'script'
 type PrjState = 0 | 1 | 2 | 3 | 4
 export interface PrjsRes {
   name: string
@@ -15,4 +14,10 @@ export interface PrjsRes {
   pid: number
   state: PrjState
   serviceURL: string
+}
+export type PrjsType = 'node' | 'mpc' | 'script'
+export const prjsTypeColor: { [key in PrjsType]: string } = {
+  node: 'green',
+  mpc: 'warning',
+  script: 'blue',
 }

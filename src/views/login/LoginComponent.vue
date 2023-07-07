@@ -42,12 +42,12 @@
             <div class="mt-8">
               <a-button type="primary" block :loading="loading" @click="onLogin"> 登录 </a-button>
             </div>
-            <div class="mt-4">
+            <!-- <div class="mt-4">
               <div class="flex justify-between">
                 <a-checkbox v-model:checked="autoLogin">自动登录</a-checkbox>
                 <a>忘记密码？</a>
               </div>
-            </div>
+            </div> -->
             <!-- <a-divider>第三方登录</a-divider> -->
             <div class="mb-4 text-xl text-center" style="color: #007cff">
               <!-- <a-space size="large">
@@ -270,8 +270,8 @@
     .form-container {
       position: absolute;
       width: 100%;
-      top: 120px;
-      right: 100px;
+      top: 160px;
+      right: 180px;
       display: flex;
       z-index: 9;
       justify-content: flex-end;
@@ -281,7 +281,7 @@
           margin-top: 5vh;
         }
         @media screen and (min-width: 996px) {
-          width: 35%;
+          width: 21%;
           margin-top: 20vh;
         }
         max-height: 80%;
@@ -342,6 +342,7 @@
         .login-wrapper {
           position: relative;
           overflow: hidden;
+          height: 300px;
           .change {
             position: absolute;
             top: 0;
@@ -374,7 +375,7 @@
               width: 90%;
             }
             @media screen and (min-width: 996px) {
-              width: 60%;
+              width: 75%;
             }
           }
           .login {

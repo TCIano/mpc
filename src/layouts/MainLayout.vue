@@ -37,7 +37,7 @@
         <Main ref="main" />
       </section>
       <section class="footer-wrapper">
-        <Footer />
+        <!-- <Footer /> -->
       </section>
       <a-back-top :target="listenTo1" />
     </div>
@@ -158,7 +158,7 @@
     }
     .main-section {
       min-height: calc(100% - 10px - @footerHeight);
-      overflow-x: hidden;
+      overflow-x: auto;
     }
     .main-section__overflow-y {
       overflow-y: hidden;

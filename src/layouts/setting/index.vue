@@ -49,7 +49,7 @@
               @click="exampleClick(item)"
             />
           </div>
-        </div>
+        </div>-->
         <a-divider dashed>布局模式</a-divider>
         <div class="flex justify-around pb-8">
           <div v-for="(item, index) of layoutExampleList" :key="index" class="example-wrapper">
@@ -63,7 +63,7 @@
               @click="layoutExampleClick(item)"
             />
           </div>
-        </div> -->
+        </div>
         <!-- <div style="height: 20px"></div> -->
         <a-divider dashed>菜单设置</a-divider>
         <div class="setting-item-wrapper">

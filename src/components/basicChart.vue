@@ -20,6 +20,7 @@
     HTMLAttributes,
   } from 'vue'
   import { chartOption } from '@/types/echarts'
+  import { isEmptyObject } from '@/utils/utils'
   interface Props {
     option: chartOption
     styleOp?: any
@@ -48,6 +49,7 @@
   watch(
     () => props.option,
     (value) => {
+      if (!isEmptyObject(value) && echartInstance) return disposeDom()
       if (echartInstance) {
         echartInstance.setOption(value)
       } else {
