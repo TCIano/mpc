@@ -109,6 +109,7 @@
         const filterTrend = trend.data.trendDatas.map((item: trendDatas, i: number) => {
           const curr = treeData.value?.[0].children?.find((tree) => tree.name === item.Name)
           return {
+            baseTime,
             ...curr,
             hiLimit: curr?.hiLimit,
             loLimit: curr?.loLimit,
@@ -166,7 +167,7 @@
           xAxis: {
             type: 'time',
             axisLabel: {
-              formatter: '{mm}:{ss}',
+              formatter: '{HH}:{mm}:{ss}',
             },
           },
           yAxis: {
@@ -180,8 +181,7 @@
               symbol: 'none',
               smooth: true,
               markLine: {
-                symbol: 'none',
-                data: [{ xAxis: time }],
+                data: [{ xAxis: isHasOccupy.baseTime }],
                 lineStyle: {
                   color: '#999',
                   type: 'dashed',
@@ -226,8 +226,6 @@
     }
 
     const newDataList = new Array(row.value * col.value).fill({})
-    console.log(newDataList)
-
     for (let index = 0; index < newDataList.length; index++) {
       if (newDataList.length > dataList.value.length) {
         newDataList[index] = dataList.value[index]
@@ -360,7 +358,7 @@
       xAxis: {
         type: 'time',
         axisLabel: {
-          formatter: '{mm}:{ss}',
+          // formatter: '{mm}:{ss}',
         },
       },
       yAxis: {
@@ -380,13 +378,13 @@
           itemStyle: {
             color: 'rgba' + item.color,
           },
-          markLine: {
-            data: [{ xAxis: dayjs().format('YYYY-MM-DD HH:mm:ss') }],
-            lineStyle: {
-              color: '#999',
-              type: 'dashed',
-            },
-          },
+          // markLine: {
+          //   data: [{ xAxis: dayjs().format('YYYY-MM-DD HH:mm:ss') }],
+          //   lineStyle: {
+          //     color: '#999',
+          //     type: 'dashed',
+          //   },
+          // },
           smooth: true,
         }
       }),

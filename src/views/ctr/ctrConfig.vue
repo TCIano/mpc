@@ -109,14 +109,14 @@
       :title="title"
       @confirm="onConfirmAdd"
       @cancel="onCancelCfg"
-      :width="600"
+      :width="630"
     >
       <template #content>
         <a-form ref="configForm" name="formConfig" :model="modalData">
-          <a-form-item label="模块名称">
+          <a-form-item label="模块名称" :rules="[{ required: true }]">
             <a-input v-model:value="modalData.name" placeholder="请输入模型名称"></a-input>
           </a-form-item>
-          <a-form-item label="模型文件">
+          <a-form-item label="模型文件" :rules="[{ required: true }]">
             <a-radio-group v-model:value="modalData.createType">
               <a-radio :style="radioStyle" v-for="item in moduleType" :value="item.value"
                 >{{ item.key }}
@@ -128,7 +128,7 @@
                     @remove="handleRemove"
                   >
                     <a-button size="small" class="w-60">
-                      <upload-outlined></upload-outlined>
+                      <upload-outlined />
                       点击上传
                     </a-button>
                   </a-upload>
@@ -469,6 +469,7 @@
     mVarDatas.value = mv()
     dVarDatas.value = dv()
     cVarDatas.value = cv()
+    fileList.value = []
     restForm()
   }
   const modalData = ref<any>(modal())
@@ -770,12 +771,15 @@
   const beforeUpload: UploadProps['beforeUpload'] = (file) => {
     //匹配.cf结尾的文件
     const ext = file.name.split('.').pop()?.toLowerCase()
-    const type = file.type || ext
-    console.log(type)
+    const name = file.name.split('.')[0]
 
+    const type = file.type || ext
     if (type === 'cf' || type === 'cmf') {
       fileList.value && handleRemove()
       fileList.value = [file]
+      if (name) {
+        modalData.value.name = name
+      }
     } else {
       message.error('文件格式不正确')
     }
@@ -783,38 +787,43 @@
   }
   const handleRemove = () => {
     fileList.value = []
+    modalData.value.name = ''
   }
   const onConfirmAdd = async () => {
-    if (!modalData.value.createType) {
-      //导入模型文件创建
-      const formData = new FormData()
-      fileList.value?.forEach((file: any) => {
-        formData.append('file', file as any)
-      })
-      formData.append('prjName', modalData.value.name)
-      formData.append('moduleType', modalData.value.moduleType)
-      await createByFileApi(formData)
-    } else {
-      await createByManualApi({
-        name: modalData.value.name,
-        moduleType: modalData.value.moduleType,
-        period: modalData.value.period, //生成模型的周期，单位：天（1天=24小时），默认为1天。
-        modelLen: modalData.value.modelLen, //模型长度，单位：字节，默认为8192字节。应
-        mVs: mVarDatas.value.map((item) => item.name),
-        dVs: dVarDatas.value.map((item) => item.name),
-        cVs: cVarDatas.value.map((item) => {
-          return {
-            name: item.name,
-            integralFlag: !!item.integralFlag,
-          }
-        }),
-      })
+    if (modalData.value.name) {
+      if (!modalData.value.createType) {
+        //导入模型文件创建
+        const formData = new FormData()
+        fileList.value?.forEach((file: any) => {
+          formData.append('file', file as any)
+        })
+        formData.append('prjName', modalData.value.name)
+        formData.append('moduleType', modalData.value.moduleType)
+        await createByFileApi(formData)
+      } else {
+        await createByManualApi({
+          name: modalData.value.name,
+          moduleType: modalData.value.moduleType,
+          period: modalData.value.period, //生成模型的周期，单位：天（1天=24小时），默认为1天。
+          modelLen: modalData.value.modelLen, //模型长度，单位：字节，默认为8192字节。应
+          mVs: mVarDatas.value.map((item) => item.name),
+          dVs: dVarDatas.value.map((item) => item.name),
+          cVs: cVarDatas.value.map((item) => {
+            return {
+              name: item.name,
+              integralFlag: !!item.integralFlag,
+            }
+          }),
+        })
 
-      //手动创建
+        //手动创建
+      }
+      configModal.value?.toggle()
+      getPrjs()
+      message.success('创建成功')
+    } else {
+      return message.warning('请输入模型名称')
     }
-    configModal.value?.toggle()
-    getPrjs()
-    message.success('创建成功')
   }
   const onImportCtr = async () => {
     //文件处理

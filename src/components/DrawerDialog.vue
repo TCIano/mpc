@@ -77,3 +77,16 @@
     },
   })
 </script>
+
+<style lang="less" scoped>
+  .drawer-dialog-wrapper {
+    ::deep(.ant-drawer-body) {
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      scrollbar-width: none;
+      -moz-scrollbar: none;
+      -ms-overflow-style: none;
+    }
+  }
+</style>

@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia'
 import { UserState } from '../types'
 import layoutStore from '../index'
-
+import { presistSettingInfo } from '@/store'
+import Setting from '@/setting'
+import { CfgFormData } from '@/types/apis/user'
+import { getPlfCfgApi } from '@/api/modules'
 import Avatar from '@/assets/img_avatar.gif'
 import Cookies from 'js-cookie'
 import { USER_INFO_KEY, USER_TOKEN_KEY } from '@/layouts/setting/keys'
@@ -42,6 +45,17 @@ const useUserStore = defineStore('user', {
         sessionStorage.clear()
         layoutStore.reset()
         resolve()
+      })
+    },
+    reloadCfg() {
+      return new Promise<CfgFormData[]>(async (resolve, reject) => {
+        const res: CfgFormData[] = await getPlfCfgApi()
+        const oldCfg = res.reduce((obj: any, curr) => {
+          obj[curr.name] = curr.value
+          return obj
+        }, {})
+        presistSettingInfo(Object.assign(Setting, oldCfg))
+        resolve(res)
       })
     },
   },

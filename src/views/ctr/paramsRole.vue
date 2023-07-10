@@ -47,28 +47,17 @@
           <a-form-item label="角色描述" name="desc">
             <a-textarea v-model:value="formData.desc" placeholder="请输入角色描述" />
           </a-form-item>
-          <template v-for="v in VarMap" :key="v">
-            <a-form-item :label="v + ' 参数'" :name="v">
+          <template v-for="(name, key) in VarMap" :key="key">
+            <a-form-item :label="name" :name="key">
               <a-select
-                v-model:value="formData[v as keyof FormData]"
+                v-model:value="formData[key as keyof FormData]"
                 mode="multiple"
                 :max-tag-count="6"
                 :field-names="{ label: 'name', value: 'name' }"
                 style="width: 100%"
                 placeholder="请选择"
-                :options="varTree[v as keyof FormData]"
+                :options="varTree[key as keyof FormData]"
               ></a-select>
-              <!-- <a-tree-select
-                multiple
-                allow-clear
-                :field-names="{
-                  label: 'name',
-                  value: 'name',
-                }"
-                palceholder="请选择"
-                v-model:value="formData[v]"
-                :tree-data="varTree[v as keyof FormData]"
-              ></a-tree-select> -->
             </a-form-item>
           </template>
         </a-form>
@@ -94,12 +83,16 @@
     id?: string
     name?: string
     desc?: string
-    ctr: string[]
+    ctr?: string[]
     mv: string[]
     dv: string[]
     cv: string[]
   }
-  const VarMap = ['ctr', 'mv', 'dv', 'cv']
+  const VarMap = {
+    mv: '操作变量',
+    dv: '扰动变量',
+    cv: '被控变量',
+  }
   const { tableHeight, handleSuccess, dataList, tableLoading } = useTable()
   const rowKey = useRowKey('id')
   const cfgModel = ref<DrawerDialogType>()
@@ -126,7 +119,7 @@
     }
   )
   const varTree = ref<FormData>({
-    ctr: [],
+    // ctr: [],
     mv: [],
     cv: [],
     dv: [],

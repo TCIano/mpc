@@ -1,11 +1,11 @@
 <template>
   <div>
-    <tree-menu-layout :left-title="(route.query.name as string)">
+    <tree-menu-layout left-title="参数角色">
       <template #left-extra>
         <a-select
           allowClear
           placeholder="请选择角色"
-          style="width: 120px"
+          style="width: 150px"
           size="small"
           v-model:value="currProles"
           @change="onChnageRole"
@@ -51,7 +51,7 @@
                 <template #icon>
                   <line-chart-outlined />
                 </template>
-                模块趋势
+                在线趋势
               </a-button>
               <a-button size="small" @click="onCheckModel" v-if="!type">
                 <template #icon>

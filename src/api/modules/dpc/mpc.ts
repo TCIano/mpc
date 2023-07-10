@@ -10,10 +10,11 @@ import {
   GetBuildFirModelInfo,
   ModalInfo,
 } from '@/types/apis/dpc/mpc'
+import pinia from '@/store/pinia'
 import useMpcStore from '@/store/modules/mpc'
 //在线实时数据
 export const MPC_HUB = DPC + '/Watch/mpcHub'
-const mpcStore = useMpcStore()
+const mpcStore = useMpcStore(pinia)
 const BASE = DPC + '/MPCPro'
 let varHttp = ''
 let ONLINE = varHttp + DPC + '/Watch/Online'

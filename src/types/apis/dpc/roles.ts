@@ -3,7 +3,7 @@ export interface ParamRoles {
   id?: string
   name?: string
   desc?: string
-  ctr: string[]
+  ctr?: string[]
   mv: string[]
   dv: string[]
   cv: string[]

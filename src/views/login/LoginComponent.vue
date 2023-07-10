@@ -115,7 +115,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import ImageBg1 from '@/assets/img_login_bg_01.jpg'
   import { post, get, Response } from '@/api/http'
-  import { loginApi } from '@/api/modules'
+  import { loginApi, getPlfCfgApi } from '@/api/modules'
   import { UserState } from '@/store/types'
   import { message } from 'ant-design-vue'
   import {
@@ -128,8 +128,11 @@
     ArrowLeftOutlined,
     PropertySafetyOutlined,
   } from '@ant-design/icons-vue'
+
+  import { CfgFormData } from '@/types/apis/user'
   import { useInterval, useIntervalFn } from '@vueuse/core'
   import useUserStore from '@/store/modules/user'
+
   export default defineComponent({
     name: 'Login',
     components: {
@@ -190,12 +193,15 @@
                   message.success('登录成功，欢迎：' + data.username)
                 })
             })
+            //获取系统配置
+            userStore.reloadCfg()
           })
           .catch((error) => {
             loading.value = false
             // message.error(error.message)
           })
       }
+
       const onRegister = () => {}
       function onChange(mode: boolean) {
         loginMode.value = mode

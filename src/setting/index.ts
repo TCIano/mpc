@@ -1,4 +1,6 @@
 import { SETTING_INFO_KEY } from '@/layouts/setting/keys'
+import { getPlfCfgApi } from '@/api/modules'
+import { CfgFormData } from '@/types/apis/user'
 
 const settingInfo = JSON.parse(localStorage.getItem(SETTING_INFO_KEY) || '{}') as Setting
 export const projectName = settingInfo.projectName || '浙江中智达科技有限公司'

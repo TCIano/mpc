@@ -5,3 +5,10 @@ export interface Users {
   isSystemReserved?: Boolean
   id: string
 }
+
+export interface CfgFormData {
+  id?: string
+  name: string
+  value: string
+  desc: string
+}

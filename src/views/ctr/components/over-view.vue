@@ -1,14 +1,13 @@
 <template>
   <div>
     <template v-for="(item, key) in mapType" :key="key">
-      <a-divider orientation="left">{{ keyMap[key as any] }}</a-divider>
+      <a-divider v-if="item.data.length" orientation="left">{{ keyMap[key as any] }}</a-divider>
       <a-table
         v-if="item.data.length"
         bordered
         :pagination="false"
         :columns="item.col"
         :data-source="item.data"
-        :scroll="{ x: 800 }"
       >
         <template #bodyCell="{ index, column, text, value, record }">
           <template v-if="column.title === '最近一次运行时间'">
@@ -22,11 +21,24 @@
               >
                 <a-input
                   v-if="column.isEnumValueType === false"
+                  v-click-outside:onCancleSelect.editData.record="{
+                    editData,
+                    record,
+                    indexName: 'varName',
+                  }"
                   v-model:value="record[column.dataIndex]"
                   @pressEnter="saveCellValue(column, record.varName, record[column.key])"
                   class="ml-5"
                 ></a-input>
-                <a-select v-else v-model:value="record[column.dataIndex]" class="w-full">
+                <a-select
+                  v-else
+                  autofocus
+                  defaultOpen
+                  @blur="onCancleSelect(record)"
+                  @dropdownVisibleChange="(open:boolean)=>onDrop(open,record[column.key],record)"
+                  v-model:value="record[column.dataIndex]"
+                  class="w-full"
+                >
                   <a-select-option
                     v-for="option in column.valueRange"
                     :key="option"
@@ -50,7 +62,7 @@
                 class="editable-cell-text-wrapper"
                 :style="{ color: handleVarColor(text) }"
               >
-                <span class="editable-cell-text">
+                <span class="editable-cell-text" @dblclick="ondblclick(column, record)">
                   {{ text }}
                 </span>
                 <edit-outlined @click="editCellValue(column, record)" class="editable-cell-icon" />
@@ -65,7 +77,7 @@
 
 <script setup lang="ts">
   import { ref, reactive, watch, onMounted, UnwrapRef, computed } from 'vue'
-  import { cloneDeep } from 'lodash-es'
+  import { cloneDeep, isEqualWith } from 'lodash-es'
   import { handleVarColor } from '@/utils/utils'
   import { useTableColumn, useTable } from '@/hooks/table'
   import { PrjTotalData, Params, varColor } from '@/types/apis/dpc/mpc'
@@ -129,6 +141,7 @@
         if (currentCps) {
           const key = curr.id.toString()
           // obj.varName = (props.componentData as PrjTotalData).cPs?.name
+          obj.varName = 'ctr'
           obj[key] = curr.value || ''
         }
         return obj
@@ -190,6 +203,20 @@
 
   const editCellValue = (column: typeof TableColumn, record: any) => {
     editData[record?.varName] = column
+  }
+
+  //失去焦点呢取消选择
+  const onCancleSelect = (record: any) => {
+    editData[record?.varName] = {}
+  }
+  //展开下拉框事件
+  const onDrop = (open: boolean, value: any, record: any) => {
+    //判断当前值和原来值是否相等如果相等，则直接失去焦点
+    const isEqual = value === editData[record.varName].value
+    !open && isEqual && onCancleSelect(record)
+  }
+  const ondblclick = (column: typeof TableColumn, record: any) => {
+    editCellValue(column, record)
   }
   //保存单元格
   const saveCellValue = async (col: any, varName: string, value: string) => {

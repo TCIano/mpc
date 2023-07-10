@@ -1,12 +1,17 @@
 <template>
   <div class="treeMenu-layout">
-    <a-row :gutter="5">
+    <a-row>
       <!-- 左侧树形 -->
       <a-col :span="4" v-if="hasLeft">
         <a-card
           class="treeMenu-menu"
           :title="props.leftTitle"
-          :style="{ height: height || treeHeight + 'px', scrollY: true, overflowY: 'scroll' }"
+          :style="{
+            height: height || treeHeight + 'px',
+            scrollY: true,
+            overflowY: 'scroll',
+            minWidth: '185px',
+          }"
           :bodyStyle="{ padding: '5px' }"
           :headerStyle="{ padding: '5px' }"
         >
@@ -28,7 +33,7 @@
             width: '100%',
             padding: '0px',
             overflowY: 'scroll',
-            overflowX: 'hidden',
+            overflowX: 'auto',
           }"
         >
           <slot name="centerContent"></slot>
@@ -73,12 +78,15 @@
 </script>
 
 <style scoped lang="less">
-  .treeMenu-menu {
-    &::-webkit-scrollbar {
-      display: none;
+  .treeMenu-layout {
+    min-width: 1200px;
+    .treeMenu-menu {
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      scrollbar-width: none;
+      -moz-scrollbar: none;
+      -ms-overflow-style: none;
     }
-    scrollbar-width: none;
-    -moz-scrollbar: none;
-    -ms-overflow-style: none;
   }
 </style>

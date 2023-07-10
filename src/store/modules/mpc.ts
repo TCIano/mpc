@@ -8,7 +8,6 @@ const useMpcStore = defineStore('mpc', {
   },
   actions: {
     saveUrl(mpcOnlineUrl: string) {
-      console.log(mpcOnlineUrl)
       this.onlineUrl = ''
       this.onlineUrl = mpcOnlineUrl || ''
     },

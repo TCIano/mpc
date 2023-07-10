@@ -54,7 +54,7 @@
           :label-col="{ span: 4 }"
           :wrapper-col="{ span: 18 }"
         >
-          <a-form-item label="键" name="name" :rules="[{ required: true, message: '请输入键' }]">
+          <a-form-item label="名称" name="name" :rules="[{ required: true, message: '请输入键' }]">
             <a-input v-model:value="formData.name" placeholder="请输入键" />
           </a-form-item>
           <a-form-item label="值" name="value" :rules="[{ required: true, message: '请输入值' }]">
@@ -82,18 +82,16 @@
     watchEffect,
     computed,
   } from 'vue'
-  import { addPlfCfgApi, deletePlfCfgApi, getPlfCfgApi, updatePlfCfgApi } from '@/api/modules'
+  import { addPlfCfgApi, deletePlfCfgApi, updatePlfCfgApi, getPlfCfgApi } from '@/api/modules'
   import { DrawerDialogType } from '@/types/components'
   import Setting from '@/setting'
   import { presistSettingInfo } from '@/store'
   import { cloneDeep } from 'lodash-es'
-  interface FormData {
-    id?: string
-    name: string
-    value: string
-    desc: string
-  }
+  import { CfgFormData } from '@/types/apis/user'
+  import useUserStore from '@/store/modules/user'
+  import { getSystemCfg } from '@/setting'
   const selectedKeys = ref<string[]>(['pltf'])
+  const userStore = useUserStore()
   const { handleSuccess, tableHeight, tableLoading, dataList } = useTable()
   const diaTitle = ref<string>('')
   const cfgMode = ref<DrawerDialogType>()
@@ -101,7 +99,7 @@
   const colums = useTableColumn(
     [
       {
-        title: '键',
+        title: '名称',
         key: 'name',
         dataIndex: 'name',
       },
@@ -133,7 +131,7 @@
       desc: '',
     }
   }
-  const formData = ref<FormData>(useFormData())
+  const formData = ref<CfgFormData>(useFormData())
   const resetForm = () => {
     formRef.value?.resetFields()
     formRef.value?.clearValidate()
@@ -146,7 +144,7 @@
     cfgMode.value.show()
     diaTitle.value = 'add'
   }
-  const onEdit = (record: FormData) => {
+  const onEdit = (record: CfgFormData) => {
     diaTitle.value = 'edit'
     cfgMode.value.show()
     // for (const key in record) {
@@ -154,23 +152,16 @@
     // }
     formData.value = cloneDeep(record)
   }
-  const onDelete = async (record: FormData) => {
+  const onDelete = async (record: CfgFormData) => {
     await deletePlfCfgApi(record.id)
     message.success('删除成功')
     doRefresh()
   }
   const doRefresh = () => {
     //可进行封装，和进入页面获取配置一起封装
-    setTimeout(async () => {
-      const res: FormData[] = await getPlfCfgApi()
+    userStore.reloadCfg().then((res) => {
       handleSuccess(res)
-      const oldCfg = res.reduce((obj: any, curr) => {
-        obj[curr.name] = curr.value
-        return obj
-      }, {})
-
-      presistSettingInfo(Object.assign(Setting, oldCfg))
-    }, 500)
+    })
   }
   const onOprionConfirm = async () => {
     try {

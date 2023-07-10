@@ -7,6 +7,7 @@ import router from './router'
 import { DeviceType } from './types/store'
 import './utils/router'
 import '../mock'
+import { Direction } from '@/directive'
 // import 'ant-design-vue/dist/antd.css'
 import './styles/theme/antd.dark.min.css'
 import './styles/theme/antd.min.css'
@@ -40,6 +41,10 @@ app.use(LayoutStore, {
       })
     },
   },
+})
+//注册自定义指令
+Object.keys(Direction).forEach((name, i) => {
+  app.directive(name, Direction[name])
 })
 app.use(pinia)
 
