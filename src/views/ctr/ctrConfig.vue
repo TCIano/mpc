@@ -31,6 +31,7 @@
         :loading="tableLoading"
         :rowKey="rowKey"
         :data-source="dataList"
+        :customRow="(record:MpcPrjsRes, index:number) => useCustomeRowSelect<MpcPrjsRes>(record, index, 'name')"
         :row-selection="{ selectedRowKeys, onChange: onSelectChange, type: 'radio' }"
       >
         <template #headerCell="{ column }">
@@ -349,7 +350,13 @@
   import { ModalDialogType } from '@/types/components'
   import { ref, onMounted, reactive, computed, nextTick, onUpdated } from 'vue'
   import type { UnwrapRef } from 'vue'
-  import { useTable, useRowKey, usePagination, useRowSelection } from '@/hooks/table'
+  import {
+    useTable,
+    useRowKey,
+    usePagination,
+    useRowSelection,
+    useCustomeRowSelect,
+  } from '@/hooks/table'
   import {
     getMpcPrjsApi,
     EXPORT_CTR,

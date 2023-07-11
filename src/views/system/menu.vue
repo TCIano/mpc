@@ -13,10 +13,23 @@
           :row-key="rowKey"
           :columns="tableColumns"
           :pagination="false"
+          bordered
         >
-          <template #bodyCell="{ column, record, index }">
+          <template #bodyCell="{ column, record, index, text }">
             <template v-if="column.key === 'index'">
               {{ index + 1 }}
+            </template>
+            <template v-if="column.key === 'sortNumber'">
+              <a-badge
+                :showZero="true"
+                :count="text"
+                :number-style="{
+                  backgroundColor: '#fff',
+                  color: '#000c',
+                  fontWeight: '600',
+                  boxShadow: '0 0 0 1px #d9d9d9 inset',
+                }"
+              />
             </template>
             <template v-if="column.key === 'icon'">
               <component :is="record.icon || 'MenuOutlined'" style="font-size: 18px" />
@@ -132,6 +145,11 @@
           {
             title: '菜单图标',
             key: 'icon',
+          },
+          {
+            title: '排序',
+            key: 'sortNumber',
+            dataIndex: 'sortNumber',
           },
           {
             title: '是否缓存',

@@ -48,15 +48,15 @@
             <a-textarea v-model:value="formData.desc" placeholder="请输入角色描述" />
           </a-form-item>
           <template v-for="(name, key) in VarMap" :key="key">
-            <a-form-item :label="name" :name="key">
+            <a-form-item :label="nameMap[name as keyof NameMap]" :name="key">
               <a-select
-                v-model:value="formData[key as keyof FormData]"
+                v-model:value="formData[name as keyof FormData]"
                 mode="multiple"
                 :max-tag-count="6"
                 :field-names="{ label: 'name', value: 'name' }"
                 style="width: 100%"
                 placeholder="请选择"
-                :options="varTree[key as keyof FormData]"
+                :options="varTree[name as keyof FormData]"
               ></a-select>
             </a-form-item>
           </template>
@@ -88,11 +88,18 @@
     dv: string[]
     cv: string[]
   }
-  const VarMap = {
+  interface NameMap {
+    mv: string
+    dv: string
+    cv: string
+  }
+  const nameMap: NameMap = {
     mv: '操作变量',
     dv: '扰动变量',
     cv: '被控变量',
   }
+  const VarMap = ['mv', 'dv', 'cv']
+
   const { tableHeight, handleSuccess, dataList, tableLoading } = useTable()
   const rowKey = useRowKey('id')
   const cfgModel = ref<DrawerDialogType>()

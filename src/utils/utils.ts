@@ -103,3 +103,21 @@ export const handleVarColor = (text: string) => {
 export function isEmptyObject(obj: object) {
   return Object.keys(obj).length === 0
 }
+/**
+ *  字符串转为base64
+ * @param str string
+ * @returns base64
+ */
+export function string2Base64(str: string) {
+  const utf8 = encodeURIComponent(str)
+  return window.btoa(utf8)
+}
+/**
+ * base64转为字符串
+ * @param b64 base64
+ * @returns string
+ */
+export function base642String(b64: string) {
+  const utf8 = window.atob(b64)
+  return decodeURIComponent(escape(utf8))
+}

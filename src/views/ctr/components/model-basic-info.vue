@@ -16,11 +16,12 @@
             class="editable-cell-input-wrapper"
           >
             <a-input
+              v-click-outside
+              @blur="editData = {}"
               v-show="column.key === 'tagName'"
               v-model:value="editData[index].tagName"
               class="ml-5"
             ></a-input>
-
             <check-outlined
               class="editable-cell-icon-check"
               @click="saveCellValue(index, column.key)"
@@ -33,6 +34,7 @@
                 : text
             "
             v-else
+            @dblclick="record.policy.startsWith('位号') ? ondblclick(index, value, column.key) : ''"
             :class="
               record.policy.startsWith('位号') ? 'text-blue-500 editable-cell-text-wrapper' : ''
             "
@@ -62,24 +64,34 @@
             class="editable-cell-input-wrapper"
           >
             <a-input-number
+              v-click-outside
+              @blur="editData = {}"
               v-show="column.key === 'curK'"
               @pressEnter="saveCellValue(index, column.key)"
               v-model:value="editData[index].curK"
               class="ml-5"
             ></a-input-number>
             <a-input-number
+              v-click-outside
+              @blur="editData = {}"
               v-show="column.key === 'lowLimit'"
               @pressEnter="saveCellValue(index, column.key)"
               v-model:value.number="editData[index].lowLimit"
               class="ml-5"
             ></a-input-number>
             <a-input-number
+              v-click-outside
+              @blur="editData = {}"
               v-show="column.key === 'hiLimit'"
               @pressEnter="saveCellValue(index, column.key)"
               v-model:value.number="editData[index].hiLimit"
               class="ml-5"
             ></a-input-number>
             <a-select
+              autofocus
+              defaultOpen
+              @blur="onCancleSelect"
+              @dropdownVisibleChange="(open:boolean)=>onDrop(open,record,editData[index].policy)"
               v-show="column.key === 'policy'"
               v-model:value="editData[index].policy"
               class="w-full"
@@ -90,11 +102,11 @@
             </a-select>
             <check-outlined
               class="editable-cell-icon-check"
-              @click="saveCellValue(index, column.key)"
+              @mousedown="() => saveCellValue(index, column.key)"
             />
           </div>
           <div :title="text" v-else class="text-blue-500 editable-cell-text-wrapper">
-            <span class="editable-cell-text">
+            <span class="editable-cell-text" @dblclick="ondblclick(index, value, column.key)">
               {{ text }}
             </span>
             <edit-outlined
@@ -181,8 +193,19 @@
     editData.value[key] = cloneDeep(props.componentData[key])
     editData.value.dataIndex = dataIndex
   }
+  const ondblclick = (index: number, value: string, key: string) => {
+    editCellValue(index, value, key)
+  }
+  const onCancleSelect = () => {
+    editData.value = {}
+  }
+  const onDrop = (open: boolean, record: any, old: string) => {
+    const isEqual = record.policy === old
+    !open && isEqual && onCancleSelect()
+  }
   //保存单元格
   const saveCellValue = async (key: string, param: string) => {
+    console.log(111)
     //判断当前增益和增益上下限匹配问题
     const { curK, inputName, outputName, policy, hiLimit, lowLimit, tagName } = editData.value[key]
     const isPass = curK >= lowLimit && curK <= hiLimit && lowLimit < hiLimit

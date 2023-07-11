@@ -27,6 +27,8 @@ function getScreenType() {
 }
 
 const app = createApp(App)
+app.use(router)
+app.use(pinia)
 app.use(LayoutStore, {
   state: {
     device: getScreenType(),
@@ -46,9 +48,7 @@ app.use(LayoutStore, {
 Object.keys(Direction).forEach((name, i) => {
   app.directive(name, Direction[name])
 })
-app.use(pinia)
 
-app.use(router)
 router.isReady().then(() => {
   app.mount('#app')
 })

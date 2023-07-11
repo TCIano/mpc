@@ -1,9 +1,13 @@
 import { SETTING_INFO_KEY } from '@/layouts/setting/keys'
-import { getPlfCfgApi } from '@/api/modules'
-import { CfgFormData } from '@/types/apis/user'
+import useUserStore from '@/store/modules/user'
+import pinia from '@/store/pinia'
+const userStore = useUserStore(pinia)
+const { systemCfg } = await userStore.reloadCfg()
 
-const settingInfo = JSON.parse(localStorage.getItem(SETTING_INFO_KEY) || '{}') as Setting
-export const projectName = settingInfo.projectName || '浙江中智达科技有限公司'
+const settingInfo = JSON.parse(
+  localStorage.getItem(SETTING_INFO_KEY) || JSON.stringify(systemCfg) || '{}'
+) as Setting
+export const projectName = settingInfo.projectName
 interface Setting {
   projectName: string
   theme: 'light' | 'dark'
@@ -37,7 +41,7 @@ export default Object.assign(
     isFixedNavBar: true,
     isOpenWaterMark: false,
     waterMark: projectName,
-    projectName,
+    projectName: '',
     isGray: false,
     projectLogo: 'logo',
     actionBar: {

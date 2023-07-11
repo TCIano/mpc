@@ -84,12 +84,9 @@
   } from 'vue'
   import { addPlfCfgApi, deletePlfCfgApi, updatePlfCfgApi, getPlfCfgApi } from '@/api/modules'
   import { DrawerDialogType } from '@/types/components'
-  import Setting from '@/setting'
-  import { presistSettingInfo } from '@/store'
   import { cloneDeep } from 'lodash-es'
   import { CfgFormData } from '@/types/apis/user'
   import useUserStore from '@/store/modules/user'
-  import { getSystemCfg } from '@/setting'
   const selectedKeys = ref<string[]>(['pltf'])
   const userStore = useUserStore()
   const { handleSuccess, tableHeight, tableLoading, dataList } = useTable()
@@ -157,11 +154,11 @@
     message.success('删除成功')
     doRefresh()
   }
-  const doRefresh = () => {
+  const doRefresh = async () => {
     //可进行封装，和进入页面获取配置一起封装
-    userStore.reloadCfg().then((res) => {
-      handleSuccess(res)
-    })
+    const { apiCfg, systemCfg } = await userStore.reloadCfg()
+    handleSuccess(apiCfg)
+    await userStore.presistSystemCfg(systemCfg as any)
   }
   const onOprionConfirm = async () => {
     try {

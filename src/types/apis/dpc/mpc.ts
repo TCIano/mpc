@@ -1,5 +1,6 @@
 export interface MpcPrjsRes {
   name: string
+  fileName: string
   desc: string
   type: string
   fileTime: string

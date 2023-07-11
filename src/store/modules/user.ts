@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { UserState } from '../types'
 import layoutStore from '../index'
 import { presistSettingInfo } from '@/store'
+import { StateType } from '@/types/store'
 import Setting from '@/setting'
 import { CfgFormData } from '@/types/apis/user'
 import { getPlfCfgApi } from '@/api/modules'
@@ -20,6 +21,8 @@ const useUserStore = defineStore('user', {
       userName: userInfo.username || '',
       menus: userInfo.menus || [],
       redirectURL: userInfo.redirectURL || '',
+      avatar: userInfo.avatar || defaultAvatar,
+      systemCfg: '',
     }
   },
   actions: {
@@ -33,9 +36,6 @@ const useUserStore = defineStore('user', {
         res()
       })
     },
-    // changeNickName(newNickName: string) {
-    //   this.nickName = newNickName
-    // },
     logout() {
       return new Promise<void>((resolve) => {
         this.userName = ''
@@ -47,15 +47,20 @@ const useUserStore = defineStore('user', {
         resolve()
       })
     },
-    reloadCfg() {
-      return new Promise<CfgFormData[]>(async (resolve, reject) => {
-        const res: CfgFormData[] = await getPlfCfgApi()
-        const oldCfg = res.reduce((obj: any, curr) => {
-          obj[curr.name] = curr.value
-          return obj
-        }, {})
-        presistSettingInfo(Object.assign(Setting, oldCfg))
-        resolve(res)
+    async reloadCfg() {
+      const res: CfgFormData[] = await getPlfCfgApi()
+      this.systemCfg = res.reduce((obj: any, curr) => {
+        obj[curr.name] = curr.value
+        return obj
+      }, {})
+      return {
+        apiCfg: res,
+        systemCfg: this.systemCfg,
+      }
+    },
+    presistSystemCfg(res: StateType) {
+      return new Promise<void>((resolve, reject) => {
+        presistSettingInfo(Object.assign(Setting, res))
       })
     },
   },

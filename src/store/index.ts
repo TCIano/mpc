@@ -14,7 +14,6 @@ import { SETTING_INFO_KEY } from '@/layouts/setting/keys'
 export function presistSettingInfo(setting: any) {
   localStorage.setItem(SETTING_INFO_KEY, JSON.stringify(setting))
 }
-
 !localStorage.getItem(SETTING_INFO_KEY) && presistSettingInfo(Setting)
 
 const originState = {

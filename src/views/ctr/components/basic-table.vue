@@ -16,6 +16,8 @@
               class="editable-cell-input-wrapper"
             >
               <a-input
+                v-click-outside
+                @blur="editData = {}"
                 v-show="column.key === 'tagName'"
                 v-model:value="editData[record.id].tagName"
                 class="ml-5"
@@ -34,7 +36,14 @@
                 record.policy.startsWith('位号') ? 'text-blue-500 editable-cell-text-wrapper' : ''
               "
             >
-              <span class="editable-cell-text">
+              <span
+                class="editable-cell-text"
+                @dblclick="
+                  record.policy.startsWith('位号')
+                    ? editCellValue(record.id, value, column.key)
+                    : ''
+                "
+              >
                 {{ text || '无' }}
               </span>
               <edit-outlined
@@ -53,6 +62,8 @@
                 class="editable-cell-input-wrapper"
               >
                 <a-input
+                  v-click-outside
+                  @blur="editData = {}"
                   v-show="column.key === 'tagName'"
                   v-model:value="editData[record.id].tagName"
                   class="ml-5"
@@ -63,6 +74,10 @@
                   class="ml-5"
                 ></a-textarea>
                 <a-select
+                  autofocus
+                  defaultOpen
+                  @blur="onCancleSelect"
+                  @dropdownVisibleChange="(open:boolean)=>onDrop(open,record.policy,editData[record.id].policy)"
                   v-if="column.key === 'policy'"
                   v-model:value="editData[record.id].policy"
                   class="w-full"
@@ -76,6 +91,10 @@
                   </a-select-option>
                 </a-select>
                 <a-select
+                  autofocus
+                  defaultOpen
+                  @blur="onCancleSelect"
+                  @dropdownVisibleChange="(open:boolean)=>onDrop(open,record.value,editData[record.id].value)"
                   v-if="column.key === 'value' && record.isEnumValueType"
                   v-model:value="editData[record.id].value"
                   class="w-full"
@@ -89,6 +108,8 @@
                   </a-select-option>
                 </a-select>
                 <a-input
+                  v-click-outside
+                  @blur="editData = {}"
                   v-if="column.key === 'value' && !record.isEnumValueType"
                   v-model:value="editData[record.id].value"
                 ></a-input>
@@ -104,7 +125,10 @@
                 class="editable-cell-text-wrapper"
                 :style="{ color: handleVarColor(text) }"
               >
-                <span class="editable-cell-text">
+                <span
+                  class="editable-cell-text"
+                  @dblclick="editCellValue(record.id, value, column.key)"
+                >
                   {{ text || '无' }}
                 </span>
                 <edit-outlined
@@ -192,7 +216,15 @@
     editData.value = {}
     editData.value[key] = cloneDeep(props.tableData.param.filter((item) => key === item.id)[0])
     editData.value.dataIndex = dataIndex
-    console.log(editData.value)
+  }
+  const onCancleSelect = () => {
+    editData.value = {}
+  }
+  const onDrop = (open: boolean, record: any, old: any) => {
+    console.log(record)
+
+    const isEqual = record === old
+    !open && isEqual && onCancleSelect()
   }
   //保存单元格
   const saveCellValue = async (col: any) => {

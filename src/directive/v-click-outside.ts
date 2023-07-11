@@ -11,11 +11,13 @@ function createDocumentHandler(el: HTMLElement, binding: DirectiveBinding): Docu
     if (!el.contains(target)) {
       //判断点击的地方是否为包含元素的地方
       //不包含就失去焦点
-      const editData = binding.value.editData
-      const record = binding.value.record
-      const indexName = binding.value.indexName
-      if (editData?.[record?.[indexName]]) {
-        editData[record[indexName]] = {}
+      const editData = binding.value?.editData
+      if (editData) {
+        const record = binding.value.record
+        const indexName = binding.value.indexName
+        if (editData?.[record?.[indexName]]) {
+          editData[record[indexName]] = {}
+        }
       }
     }
   }
@@ -29,13 +31,20 @@ const handler = (e: MouseEvent) => {
 export const clickOutside: Directive = {
   mounted(el: HTMLElement, binding: DirectiveBinding) {
     //首先拿到当前元素的焦点
-    el.focus()
+    if (el.tagName.toLocaleLowerCase() == 'input') {
+      el.focus()
+    } else {
+      if (el.getElementsByTagName('input')) {
+        el.getElementsByTagName('input')[0].focus()
+      }
+    }
     nodeList = {
       documentHandler: createDocumentHandler(el, binding),
     }
     window.addEventListener('click', handler)
   },
   updated(el, binding) {
+    el.focus()
     nodeList = {
       documentHandler: createDocumentHandler(el, binding),
     }

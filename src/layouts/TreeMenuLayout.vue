@@ -32,7 +32,7 @@
             height: height || treeHeight + 'px',
             width: '100%',
             padding: '0px',
-            overflowY: 'scroll',
+            overflowY: 'auto',
             overflowX: 'auto',
           }"
         >

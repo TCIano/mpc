@@ -34,16 +34,13 @@
           <a-col :span="12">
             <codemirror
               v-model="code"
-              placeholder="编写代码..."
+              placeholder="请选择脚本或直接编写.."
               :style="{ height: codeHeigth + 'px' }"
               :autofocus="true"
               :indent-with-tab="true"
               :tab-size="2"
               :extensions="extensions"
               @ready="handleReady"
-              @change="log('change', $event)"
-              @focus="log('focus', $event)"
-              @blur="log('blur', $event)"
             />
           </a-col>
         </a-row>
@@ -84,6 +81,7 @@
   import { ScriptItem, GetSptByP } from '@/types/apis/script'
   import { DrawerDialogType } from '@/types/components'
   import { FormInstance, message } from 'ant-design-vue'
+  import { base642String, string2Base64 } from '@/utils/utils'
   export default defineComponent({
     components: {
       Codemirror,
@@ -92,7 +90,7 @@
       const table = useTable()
       const { selectedRowKeys, onSelectChange, rowSelectType } = useRowSelection('radio') //规定单多选
       rowSelectType.value = 'radio'
-      const code = ref<string | undefined | null>(`print('Hello, world!')`)
+      const code = ref<string | undefined>(``)
       const extensions = [python(), oneDark]
       const view = shallowRef()
       const codeHeigth = ref()
@@ -129,7 +127,7 @@
       })
       const replaceCode = async (name: string) => {
         const res: GetSptByP = await getScriptByPrjApi(name)
-        code.value = res.scriptContent
+        if (res.scriptContent) code.value = base642String(res.scriptContent)
       }
       const handleReady = (payload: any) => {
         view.value = payload.view
@@ -158,8 +156,8 @@
         doRefresh()
       }
       const onSaveItem = async () => {
-        console.log(selectedRowKeys.value[0], typeof code.value)
-        await saveScriptApi(selectedRowKeys.value[0] as string, code.value || '')
+        const base64 = string2Base64(code.value || '')
+        await saveScriptApi(encodeURIComponent(selectedRowKeys.value[0]) as string, base64)
         message.success('保存成功')
         doRefresh()
       }

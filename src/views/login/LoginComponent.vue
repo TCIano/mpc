@@ -170,6 +170,7 @@
       }
       const onLogin = () => {
         loading.value = true
+
         get({
           url: loginApi,
           data: {
@@ -193,8 +194,6 @@
                   message.success('登录成功，欢迎：' + data.username)
                 })
             })
-            //获取系统配置
-            userStore.reloadCfg()
           })
           .catch((error) => {
             loading.value = false
