@@ -137,8 +137,6 @@
         }
       }
       function onMenuClick({ key, item, keyPath }: any) {
-        console.log(key)
-
         if (isExternal(key)) {
           window.open(key)
         } else {

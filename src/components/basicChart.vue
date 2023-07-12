@@ -49,8 +49,6 @@
   watch(
     () => props.option,
     (value) => {
-      console.log(value)
-
       if (isEmptyObject(value) && echartInstance) return disposeDom()
       if (echartInstance) {
         echartInstance.setOption(value)

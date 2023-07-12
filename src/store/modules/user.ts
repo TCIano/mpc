@@ -47,20 +47,20 @@ const useUserStore = defineStore('user', {
         resolve()
       })
     },
-    async reloadCfg() {
-      const res: CfgFormData[] = await getPlfCfgApi()
-      this.systemCfg = res.reduce((obj: any, curr) => {
-        obj[curr.name] = curr.value
-        return obj
-      }, {})
-      return {
-        apiCfg: res,
-        systemCfg: this.systemCfg,
-      }
+    reloadCfg() {
+      return new Promise<{ apiCfg: CfgFormData[]; systemCfg: any }>(async (resolve, reject) => {
+        const res: CfgFormData[] = await getPlfCfgApi()
+        this.systemCfg = res.reduce((obj: any, curr) => {
+          obj[curr.name] = curr.value
+          return obj
+        }, {})
+        resolve({ apiCfg: res, systemCfg: this.systemCfg })
+      })
     },
     presistSystemCfg(res: StateType) {
       return new Promise<void>((resolve, reject) => {
         presistSettingInfo(Object.assign(Setting, res))
+        resolve()
       })
     },
   },

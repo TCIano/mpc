@@ -26,7 +26,9 @@
             >
               <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'action'">
-                  <a-button danger size="small" @click="onDeleteItem(record.name)">删除</a-button>
+                  <a-button danger size="small" @click.stop="onDeleteItem(record.name)"
+                    >删除</a-button
+                  >
                 </template>
               </template>
             </a-table>
@@ -127,7 +129,11 @@
       })
       const replaceCode = async (name: string) => {
         const res: GetSptByP = await getScriptByPrjApi(name)
-        if (res.scriptContent) code.value = base642String(res.scriptContent)
+        if (res.scriptContent) {
+          code.value = base642String(res.scriptContent)
+        } else {
+          code.value = ''
+        }
       }
       const handleReady = (payload: any) => {
         view.value = payload.view
@@ -157,7 +163,7 @@
       }
       const onSaveItem = async () => {
         const base64 = string2Base64(code.value || '')
-        await saveScriptApi(encodeURIComponent(selectedRowKeys.value[0]) as string, base64)
+        await saveScriptApi(selectedRowKeys.value[0] as string, base64)
         message.success('保存成功')
         doRefresh()
       }

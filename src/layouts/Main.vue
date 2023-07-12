@@ -22,6 +22,7 @@
       const cachedViews = computed(() => {
         return state.cachedView.map((it: string) => it)
       })
+
       const reload = () => {
         window.addEventListener('beforeunload', setSession)
         let sessionTabs = sessionStorage.getItem(SYSTEM_TABS_STORE)

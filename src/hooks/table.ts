@@ -100,8 +100,6 @@ export const useRowSelection = function (selectType: RowSelectType = 'checkbox')
   const onSelectChange = (tempSelectRows: Array<RowSelectKey>) => {
     selectedRowKeys.value = tempSelectRows
   }
-  console.log(rowSelectType.value)
-
   return {
     selectedRowKeys,
     onSelectChange,

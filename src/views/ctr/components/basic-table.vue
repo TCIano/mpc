@@ -221,8 +221,6 @@
     editData.value = {}
   }
   const onDrop = (open: boolean, record: any, old: any) => {
-    console.log(record)
-
     const isEqual = record === old
     !open && isEqual && onCancleSelect()
   }
@@ -230,7 +228,6 @@
   const saveCellValue = async (col: any) => {
     const prjName = route.query.name as any
     const option = editData.value[col.id]
-    console.log(option)
     await setParamValueApi(
       {
         prjName,

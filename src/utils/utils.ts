@@ -119,5 +119,5 @@ export function string2Base64(str: string) {
  */
 export function base642String(b64: string) {
   const utf8 = window.atob(b64)
-  return decodeURIComponent(escape(utf8))
+  return decodeURIComponent(utf8)
 }

@@ -253,7 +253,6 @@
       inputName: formData.value.inputName,
       outputName: formData.value.outputName,
     }
-    console.log(formData.value)
   }
   //设置模型组态信息
   const onSetFIRMode = async () => {

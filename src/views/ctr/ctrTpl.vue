@@ -335,11 +335,9 @@
   const filterOverViewVar = async () => {
     const { mVs: mvs, cPs: cps, dVs: dvs, cVs: cvs } = prjTotalData.value as PrjTotalData
     const mvp = await getParamsByIdApi(currProles.value)
-    console.log(mvp)
 
     const mVs = mvp.ctr.map((p: string) => {
       const is = mvs.find((mv) => p === mv.name)
-      console.log(p)
 
       if (is) {
         return {

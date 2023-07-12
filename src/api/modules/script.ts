@@ -34,9 +34,13 @@ export const createScriptApi = (prjName: string) => {
   })
 }
 
-export const saveScriptApi = (prjName: string, scriptContent: string) => {
+export const saveScriptApi = (prjName: string, content: string) => {
   return post({
-    url: `${SAVE_SCRIPT}?prjName=${prjName}&scriptContent=${scriptContent}`,
+    url: SAVE_SCRIPT,
+    data: {
+      prjName,
+      content,
+    },
   })
 }
 

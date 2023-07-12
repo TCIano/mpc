@@ -1,7 +1,9 @@
 import { SETTING_INFO_KEY } from '@/layouts/setting/keys'
 import useUserStore from '@/store/modules/user'
 import pinia from '@/store/pinia'
+
 const userStore = useUserStore(pinia)
+
 const { systemCfg } = await userStore.reloadCfg()
 
 const settingInfo = JSON.parse(

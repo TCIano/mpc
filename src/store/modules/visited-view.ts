@@ -90,8 +90,6 @@ export default {
           //路由参数中既没有title为给定名称也没有name为给定名称的数据留存
         }
       )
-      console.log(viewName, (this as StoreType).state.visitedView)
-
       this.persistentVisitedView()
       ;(this as StoreType).resetCachedView && (this as StoreType).resetCachedView()
       resolve()

@@ -15,7 +15,6 @@
       onMounted(() => {
         height.value = myFrame.value!.parentElement!.clientHeight
         iSrc.value = route.query.url
-        console.log(iSrc.value)
       })
       return {
         myFrame,

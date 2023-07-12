@@ -342,9 +342,7 @@
       onMounted(() => {
         doRefresh()
       })
-      onActivated(() => {
-        console.log(111)
-      })
+
       return {
         rowKey,
         actionModel,

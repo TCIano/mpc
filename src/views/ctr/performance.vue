@@ -280,9 +280,6 @@
     data.data = await handleSuccess(data)
     mainData.data = await handleSuccess(mainData)
   })
-  onActivated(() => {
-    console.log('缓存')
-  })
 </script>
 
 <style scoped lang="less">

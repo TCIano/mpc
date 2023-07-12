@@ -205,7 +205,6 @@
   }
   //保存单元格
   const saveCellValue = async (key: string, param: string) => {
-    console.log(111)
     //判断当前增益和增益上下限匹配问题
     const { curK, inputName, outputName, policy, hiLimit, lowLimit, tagName } = editData.value[key]
     const isPass = curK >= lowLimit && curK <= hiLimit && lowLimit < hiLimit

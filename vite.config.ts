@@ -8,7 +8,7 @@ import path from 'path'
 import { ConfigEnv, defineConfig } from 'vite'
 import dotenv from 'dotenv'
 import vueSetupExtend from 'vite-plugin-vue-setup-extend'
-
+import topLevelAwait from 'vite-plugin-top-level-await'
 export default ({ mode }) => {
   const dotenvConfig = dotenv.config({ path: `./.env.${mode}` })
   const dotenvObj = dotenvConfig.parsed
@@ -29,6 +29,11 @@ export default ({ mode }) => {
       PkgConfig(),
       OptimizationPersist(),
       vueSetupExtend(),
+      //顶部使用await
+      topLevelAwait({
+        promiseExportName: '__tla',
+        promiseImportName: (i) => `__tla_${i}`,
+      }),
     ] as any,
     css: {
       preprocessorOptions: {
