@@ -44,7 +44,6 @@ export const clickOutside: Directive = {
     window.addEventListener('click', handler)
   },
   updated(el, binding) {
-    el.focus()
     nodeList = {
       documentHandler: createDocumentHandler(el, binding),
     }

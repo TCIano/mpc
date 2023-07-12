@@ -17,10 +17,10 @@
           >
             <a-input
               v-click-outside
-              @blur="editData = {}"
               v-show="column.key === 'tagName'"
               v-model:value="editData[index].tagName"
               class="ml-5"
+              @blur="editData = {}"
             ></a-input>
             <check-outlined
               class="editable-cell-icon-check"
@@ -28,24 +28,18 @@
             />
           </div>
           <div
-            :title="
-              record.isEnumValueType === false
-                ? text + ' (' + record.valueRange.join(' ~ ') + ')'
-                : text
-            "
             v-else
-            @dblclick="record.policy.startsWith('位号') ? ondblclick(index, value, column.key) : ''"
-            :class="
-              record.policy.startsWith('位号') ? 'text-blue-500 editable-cell-text-wrapper' : ''
-            "
+            :title="getIsEnumValueTypeTitle(record, text)"
+            :class="{ 'text-blue-500 editable-cell-text-wrapper': policyStartWith(record) }"
+            @dblclick="policyStartWith(record) ? ondblclick(index, value, column.key) : ''"
           >
             <span class="editable-cell-text">
               {{ text || '无' }}
             </span>
             <edit-outlined
-              v-if="record.policy.startsWith('位号')"
-              @click="editCellValue(index, value, column.key)"
+              v-if="policyStartWith(record)"
               class="editable-cell-icon"
+              @click="editCellValue(index, value, column.key)"
             />
           </div>
         </div>
@@ -65,36 +59,36 @@
           >
             <a-input-number
               v-click-outside
-              @blur="editData = {}"
               v-show="column.key === 'curK'"
-              @pressEnter="saveCellValue(index, column.key)"
               v-model:value="editData[index].curK"
               class="ml-5"
+              @blur="editData = {}"
+              @pressEnter="saveCellValue(index, column.key)"
             ></a-input-number>
             <a-input-number
               v-click-outside
-              @blur="editData = {}"
               v-show="column.key === 'lowLimit'"
-              @pressEnter="saveCellValue(index, column.key)"
               v-model:value.number="editData[index].lowLimit"
               class="ml-5"
+              @pressEnter="saveCellValue(index, column.key)"
+              @blur="editData = {}"
             ></a-input-number>
             <a-input-number
               v-click-outside
-              @blur="editData = {}"
               v-show="column.key === 'hiLimit'"
-              @pressEnter="saveCellValue(index, column.key)"
               v-model:value.number="editData[index].hiLimit"
               class="ml-5"
+              @pressEnter="saveCellValue(index, column.key)"
+              @blur="editData = {}"
             ></a-input-number>
             <a-select
               autofocus
               defaultOpen
-              @blur="onCancleSelect"
-              @dropdownVisibleChange="(open:boolean)=>onDrop(open,record,editData[index].policy)"
               v-show="column.key === 'policy'"
               v-model:value="editData[index].policy"
               class="w-full"
+              @blur="onCancleSelect"
+              @dropdownVisibleChange="(open:boolean)=>onDrop(open,record,editData[index].policy)"
             >
               <a-select-option v-for="option in record.policyRange" :key="option" :value="option">
                 <span :title="option">{{ option }}</span>
@@ -110,8 +104,8 @@
               {{ text }}
             </span>
             <edit-outlined
-              @click="editCellValue(index, value, column.key)"
               class="editable-cell-icon"
+              @click="editCellValue(index, value, column.key)"
             />
           </div>
         </div>
@@ -121,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, UnwrapRef, onMounted } from 'vue'
+  import { ref, reactive, UnwrapRef, onMounted, computed } from 'vue'
   import { useTableColumn } from '@/hooks/table'
   import { useRoute } from 'vue-router'
   import { cloneDeep } from 'lodash-es'
@@ -188,6 +182,16 @@
     }
   )
   const editData: UnwrapRef<Record<string | number, any>> = ref({})
+  const policyStartWith = computed(() => {
+    return (record: any) => record.policy.startsWith('位号')
+  })
+  const getIsEnumValueTypeTitle = computed(() => {
+    return (record: any, text: string) => {
+      return record.isEnumValueType === false
+        ? text + ' (' + record.valueRange.join(' ~ ') + ')'
+        : text
+    }
+  })
   const editCellValue = (key: number, value: string, dataIndex: string) => {
     editData.value = {}
     editData.value[key] = cloneDeep(props.componentData[key])

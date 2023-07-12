@@ -8,9 +8,12 @@
             class="editable-cell-input-wrapper"
           >
             <a-select
+              defaultOpen
               v-show="column.key === 'policy'"
               v-model:value="editData[index].policy"
               style="width: 50%"
+              @blur="onCancleSelect"
+              @dropdownVisibleChange="(open:boolean)=>onDrop(open,record.policy,editData[index].policy)"
             >
               <a-select-option v-for="option in record.policyRange" :key="option" :value="option">
                 <span :title="option">{{ option }}</span>
@@ -19,12 +22,12 @@
             <check-outlined class="editable-cell-icon-check" @click="saveCellValue(index)" />
           </div>
           <div :title="text" v-else class="text-blue-500 editable-cell-text-wrapper">
-            <span class="editable-cell-text">
+            <span class="editable-cell-text" @dblclick="editCellValue(index, value, column.key)">
               {{ text }}
             </span>
             <edit-outlined
-              @click="editCellValue(index, value, column.key)"
               class="editable-cell-icon"
+              @click="editCellValue(index, value, column.key)"
             />
           </div>
         </div>
@@ -74,11 +77,17 @@
     editData.value[key] = cloneDeep(props.componentData[key])
     editData.value.dataIndex = dataIndex
   }
+  const onCancleSelect = () => {
+    editData.value = {}
+  }
+  const onDrop = (open: boolean, record: any, old: any) => {
+    const isEqual = record === old
+    !open && isEqual && onCancleSelect()
+  }
   //保存单元格
   const saveCellValue = async (key: string) => {
     //判断当前增益和增益上下限匹配问题
     const { policy, level } = editData.value[key]
-
     const prjName = route.query.name as any
     await setRankParamValueApi(
       {

@@ -6,7 +6,7 @@
       :pagination="false"
       :columns="columns"
       :data-source="tableData?.param"
-      :scroll="{ x: 1100, y: 655 }"
+      :scroll="{ x: 1100, y: 675 }"
     >
       <template #bodyCell="{ index, column, text, value, record }">
         <template v-if="column.key === 'tagName'">
@@ -17,39 +17,32 @@
             >
               <a-input
                 v-click-outside
-                @blur="editData = {}"
                 v-show="column.key === 'tagName'"
                 v-model:value="editData[record.id].tagName"
                 class="ml-5"
+                @blur="editData = {}"
               ></a-input>
-
-              <check-outlined class="editable-cell-icon-check" @click="saveCellValue(record)" />
+              <check-outlined class="editable-cell-icon-check" @mousedown="saveCellValue(record)" />
             </div>
             <div
-              :title="
-                record.isEnumValueType === false
-                  ? text + ' (' + record.valueRange.join(' ~ ') + ')'
-                  : text
-              "
               v-else
-              :class="
-                record.policy.startsWith('位号') ? 'text-blue-500 editable-cell-text-wrapper' : ''
-              "
+              :title="getIsEnumValueTypeTitle(record, text)"
+              :class="{
+                'text-blue-500 editable-cell-text-wrapper': policyStartWith(record),
+              }"
             >
               <span
                 class="editable-cell-text"
                 @dblclick="
-                  record.policy.startsWith('位号')
-                    ? editCellValue(record.id, value, column.key)
-                    : ''
+                  policyStartWith(record) ? editCellValue(record.id, value, column.key) : ''
                 "
               >
                 {{ text || '无' }}
               </span>
               <edit-outlined
-                v-if="record.policy.startsWith('位号')"
-                @click="editCellValue(record.id, value, column.key)"
+                v-if="policyStartWith(record)"
                 class="editable-cell-icon"
+                @click="editCellValue(record.id, value, column.key)"
               />
             </div>
           </div>
@@ -63,10 +56,10 @@
               >
                 <a-input
                   v-click-outside
-                  @blur="editData = {}"
                   v-show="column.key === 'tagName'"
                   v-model:value="editData[record.id].tagName"
                   class="ml-5"
+                  @blur="editData = {}"
                 ></a-input>
                 <a-textarea
                   v-show="column.key === 'desc'"
@@ -76,11 +69,11 @@
                 <a-select
                   autofocus
                   defaultOpen
-                  @blur="onCancleSelect"
-                  @dropdownVisibleChange="(open:boolean)=>onDrop(open,record.policy,editData[record.id].policy)"
-                  v-if="column.key === 'policy'"
+                  v-show="column.key === 'policy'"
                   v-model:value="editData[record.id].policy"
                   class="w-full"
+                  @blur="onCancleSelect"
+                  @dropdownVisibleChange="(open:boolean)=>onDrop(open,record.policy,editData[record.id].policy)"
                 >
                   <a-select-option
                     v-for="option in record.policyRange"
@@ -93,11 +86,11 @@
                 <a-select
                   autofocus
                   defaultOpen
-                  @blur="onCancleSelect"
-                  @dropdownVisibleChange="(open:boolean)=>onDrop(open,record.value,editData[record.id].value)"
                   v-if="column.key === 'value' && record.isEnumValueType"
                   v-model:value="editData[record.id].value"
                   class="w-full"
+                  @blur="onCancleSelect"
+                  @dropdownVisibleChange="(open:boolean)=>onDrop(open,record.value,editData[record.id].value)"
                 >
                   <a-select-option
                     v-for="option in record.valueRange"
@@ -109,19 +102,18 @@
                 </a-select>
                 <a-input
                   v-click-outside
-                  @blur="editData = {}"
-                  v-if="column.key === 'value' && !record.isEnumValueType"
+                  v-show="column.key === 'value' && !record.isEnumValueType"
                   v-model:value="editData[record.id].value"
+                  @blur="editData = {}"
                 ></a-input>
-                <check-outlined class="editable-cell-icon-check" @click="saveCellValue(record)" />
+                <check-outlined
+                  class="editable-cell-icon-check"
+                  @mousedown="saveCellValue(record)"
+                />
               </div>
               <div
-                :title="
-                  record.isEnumValueType === false
-                    ? text + ' (' + record.valueRange.join(' ~ ') + ')'
-                    : text
-                "
                 v-else
+                :title="getIsEnumValueTypeTitle(record, text)"
                 class="editable-cell-text-wrapper"
                 :style="{ color: handleVarColor(text) }"
               >
@@ -132,8 +124,8 @@
                   {{ text || '无' }}
                 </span>
                 <edit-outlined
-                  @click="editCellValue(record.id, value, column.key)"
                   class="editable-cell-icon"
+                  @click="editCellValue(record.id, value, column.key)"
                 />
               </div>
             </div>
@@ -149,7 +141,7 @@
 
   import { useTableColumn } from '@/hooks/table'
   import { Params } from '@/types/apis/dpc/mpc'
-  import { ref, UnwrapRef, onMounted } from 'vue'
+  import { ref, UnwrapRef, computed } from 'vue'
   import { useRoute } from 'vue-router'
   import { handleVarColor } from '@/utils/utils'
   import { setParamValueApi } from '@/api/modules'
@@ -212,6 +204,16 @@
   )
   const basicTable = ref<Element>()
   const editData: UnwrapRef<Record<string | number, any>> = ref({})
+  const getIsEnumValueTypeTitle = computed(() => {
+    return (record: Params, text: string) => {
+      return record.isEnumValueType === false
+        ? text + ' (' + record.valueRange.join(' ~ ') + ')'
+        : text
+    }
+  })
+  const policyStartWith = computed(() => {
+    return (record: Params) => record.policy.startsWith('位号')
+  })
   const editCellValue = (key: number, value: string, dataIndex: string) => {
     editData.value = {}
     editData.value[key] = cloneDeep(props.tableData.param.filter((item) => key === item.id)[0])

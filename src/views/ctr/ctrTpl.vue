@@ -477,7 +477,7 @@
   }
   const onCheckModel = async () => {
     const res = await getCheckResultApi(route.query.name as string)
-    message.success(res.length ? res.join(',') : '模型检查通过')
+    message.warning(res.length ? res.join(',') : '模型检查通过')
   }
   const onSetIOSName = async () => {
     await setIOServerApi(route.query.name as string, prjTotalData.value?.ioSeverDataSource || '')
