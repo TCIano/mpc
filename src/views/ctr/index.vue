@@ -43,7 +43,11 @@
                   <template v-if="column.key === 'name'">
                     <a
                       href=""
-                      @click.prevent="onToCtrOnline(record.name, record.serviceURL, record.state)"
+                      @click.prevent="
+                        record.type === 'mpc'
+                          ? onToCtrOnline(record.name, record.serviceURL, record.state)
+                          : ''
+                      "
                       >{{ record.name }}</a
                     >
                   </template>
@@ -86,9 +90,9 @@
                           @click="onButtonOption(record, 'reload')"
                         />
                       </div>
-                      <div title="启动MPC在线监控">
+                      <div title="启动MPC在线监控" v-if="record.type === 'mpc'">
                         <line-chart-outlined
-                          class="text-xl cursor-pointer"
+                          class="text-xl"
                           @click="onToCtrOnline(record.name, record.serviceURL, record.state)"
                         />
                       </div>
@@ -259,19 +263,19 @@
       await runPrjApi(options)
       logList.value.push({
         time: currentTime(),
-        event: name + '正在加载',
+        event: name + ' : 正在运行...',
       })
     } else if (tag === 'stop') {
       await stopPrjApi(options)
       logList.value.push({
         time: currentTime(),
-        event: name + '正在停止',
+        event: name + ' : 正在停止',
       })
     } else if (tag === 'reload') {
       await reloadPrjApi(options)
       logList.value.push({
         time: currentTime(),
-        event: name + '正在重新加载',
+        event: name + ' : 正在重新加载',
       })
     }
     // getPrjs(Number(status.value))
@@ -317,9 +321,7 @@
       import.meta.env.MODE === 'development' ? 'http://192.168.0.49:62102' : window.origin
     )
     signalR = new SignalR(CPM_HUB)
-    // signalR.onMessageReceived(NOTIFY_PRJ_STATE_CHANGED, (res: string) => {
-    //   const { data } = JSON.parse(res)
-    // })
+
     signalR.onMessageReceived(
       NOTIFY_PRJ_OPERATION_RESULT,
       (type: keyof signaRType, res: string) => {
@@ -330,7 +332,8 @@
             time: currentTime(),
             event: data.Name + ' : ' + signaRType[type],
           })
-          handleState(loadRes.value, 5)
+          //每次操作需要重新获取d当前状态的工程
+          getPrjs(status.value)
         } else {
           logList.value.push({
             time: currentTime(),
@@ -373,13 +376,14 @@
     })
     logList.value.push({
       time: currentTime(),
-      event: name + '正在加载...',
+      event: name + ' : 正在加载...',
     })
     //重新加载页面
     // await getPrjs(Number(status.value))
   }
   //卸载节点
   const onUnLoadNode = async ({ name, type, fileURL, state }: any) => {
+    // getPrjs(status.value)
     await unloadPrjApi({
       name,
       type,
@@ -392,7 +396,7 @@
     //重新加载页面
     const index = loadRes.value.findIndex((item: any) => item.name === name)
     loadRes.value.splice(index, 1)
-    //删除tab栏目相对应的此工程的在线页面以及趋势图页面
+    // //删除tab栏目相对应的此工程的在线页面以及趋势图页面
     store.closePrjVisitedViewByName(name)
   }
   /**

@@ -16,11 +16,12 @@
               class="editable-cell-input-wrapper"
             >
               <a-input
+                ref="inputRef"
                 v-click-outside
                 v-show="column.key === 'tagName'"
                 v-model:value="editData[record.id].tagName"
                 class="ml-5"
-                @blur="editData = {}"
+                @blur="onBlur"
               ></a-input>
               <check-outlined class="editable-cell-icon-check" @mousedown="saveCellValue(record)" />
             </div>
@@ -54,13 +55,6 @@
                 v-if="editData[record.id] && editData.dataIndex === column.key"
                 class="editable-cell-input-wrapper"
               >
-                <a-input
-                  v-click-outside
-                  v-show="column.key === 'tagName'"
-                  v-model:value="editData[record.id].tagName"
-                  class="ml-5"
-                  @blur="editData = {}"
-                ></a-input>
                 <a-textarea
                   v-show="column.key === 'desc'"
                   v-model:value="editData[record.id].desc"
@@ -102,10 +96,10 @@
                 </a-select>
                 <a-input
                   v-click-outside
-                  v-show="column.key === 'value' && !record.isEnumValueType"
+                  v-if="column.key === 'value' && !record.isEnumValueType"
                   v-model:value="editData[record.id].value"
-                  @blur="editData = {}"
-                ></a-input>
+                  @blur="onBlur"
+                />
                 <check-outlined
                   class="editable-cell-icon-check"
                   @mousedown="saveCellValue(record)"
@@ -202,6 +196,11 @@
     ],
     { align: 'center', ellipsis: true }
   )
+  const inputRef = ref<HTMLElement>()
+  const onBlur = (e: MouseEvent) => {
+    editData.value = {}
+  }
+
   const basicTable = ref<Element>()
   const editData: UnwrapRef<Record<string | number, any>> = ref({})
   const getIsEnumValueTypeTitle = computed(() => {
@@ -228,6 +227,8 @@
   }
   //保存单元格
   const saveCellValue = async (col: any) => {
+    console.log(12)
+
     const prjName = route.query.name as any
     const option = editData.value[col.id]
     await setParamValueApi(

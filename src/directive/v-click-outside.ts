@@ -8,6 +8,8 @@ let nodeList: ListProps = {}
 function createDocumentHandler(el: HTMLElement, binding: DirectiveBinding): DocumentHandler {
   return function (e: MouseEvent) {
     const target = e.target as HTMLElement
+    console.log(target)
+
     if (!el.contains(target)) {
       //判断点击的地方是否为包含元素的地方
       //不包含就失去焦点
@@ -33,6 +35,7 @@ export const clickOutside: Directive = {
     //首先拿到当前元素的焦点
     if (el.tagName.toLocaleLowerCase() == 'input') {
       el.focus()
+      console.log(1)
     } else {
       if (el.getElementsByTagName('input')) {
         el.getElementsByTagName('input')[0].focus()
@@ -43,11 +46,7 @@ export const clickOutside: Directive = {
     }
     window.addEventListener('click', handler)
   },
-  updated(el, binding) {
-    nodeList = {
-      documentHandler: createDocumentHandler(el, binding),
-    }
-  },
+
   beforeUnmount(el: any) {
     window.removeEventListener('click', handler)
   },

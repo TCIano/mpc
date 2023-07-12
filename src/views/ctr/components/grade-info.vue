@@ -1,7 +1,7 @@
 <template>
-  <a-table :columns="columns" :data-source="componentData" :pagination="false">
+  <a-table style="width: 65%" :columns="columns" :data-source="componentData" :pagination="false">
     <template #bodyCell="{ record, column, text, value, index }">
-      <template v-if="(type ? [''] : ['policy']).includes(column.key)">
+      <template v-if="column.key === 'policy'">
         <div class="editable-cell">
           <div
             v-if="editData[index] && editData.dataIndex === column.key"
@@ -68,7 +68,7 @@
     ],
     {
       align: 'center',
-      width: 150,
+      width: 100,
     }
   )
   const editData: UnwrapRef<Record<string | number, any>> = ref({})

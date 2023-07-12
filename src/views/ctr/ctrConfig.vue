@@ -318,7 +318,12 @@
     <!-- 新建模型抽屉 -->
 
     <!-- 文件导入抽屉 -->
-    <drawer-dialog ref="importModal" title="导入" @confirm="onImportCtr">
+    <drawer-dialog
+      ref="importModal"
+      title="导入"
+      @confirm="onImportCtr"
+      @cancel="onCancelImportCtr"
+    >
       <template #content>
         <a-form :model="importData" :label-col="{ span: 5 }">
           <a-form-item label="导入模式">
@@ -709,7 +714,6 @@
   }
   const restForm = () => {
     Object.assign(modalData.value, modal())
-
     configForm.value?.clearValidate()
     configForm.value?.resetFields()
   }
@@ -774,7 +778,11 @@
     handleRemove()
     importModal.value?.show()
   }
-
+  const onCancelImportCtr = () => {
+    modalData.value.name = ''
+    fileList.value = []
+    Object.assign(importData.value, importModalValue())
+  }
   const beforeUpload: UploadProps['beforeUpload'] = (file) => {
     //匹配.cf结尾的文件
     const ext = file.name.split('.').pop()?.toLowerCase()
