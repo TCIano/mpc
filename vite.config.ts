@@ -5,7 +5,7 @@ import OptimizationPersist from 'vite-plugin-optimize-persist'
 import PkgConfig from 'vite-plugin-package-config'
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
 import path from 'path'
-import { ConfigEnv, defineConfig } from 'vite'
+import { ConfigEnv, defineConfig, loadEnv } from 'vite'
 import dotenv from 'dotenv'
 import vueSetupExtend from 'vite-plugin-vue-setup-extend'
 import topLevelAwait from 'vite-plugin-top-level-await'
@@ -63,7 +63,7 @@ export default ({ mode }) => {
           changeOrigin: true,
         },
         '/api/pms': {
-          target: 'http://192.168.0.49:62102',
+          target: dotenvObj?.VITE_MPC_HTTP_PMS,
           changeOrigin: true,
         },
         // '/api/MPC': {

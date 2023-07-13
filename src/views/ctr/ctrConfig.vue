@@ -759,18 +759,6 @@
     getPrjs()
     message.success('删除成功')
   }
-  //保存
-  // const onSaveCtr = async () => {
-  //   // await saveMpcPrjApi()
-  // }
-  // onBeforeRouteLeave(() => {
-  //   const isCanGo = window.confirm('是否保存工程？')
-  //   console.log(isCanGo)
-  //   if (isCanGo) {
-  //     //保存控制器
-  //   }
-  // })
-  //保存
 
   //导入控制器工程
   const onImportCtrModal = () => {

@@ -318,10 +318,9 @@
   //获取日志
   const getLogs = async () => {
     mpcStore.saveUrl(
-      import.meta.env.MODE === 'development' ? 'http://192.168.0.49:62102' : window.origin
+      import.meta.env.MODE === 'development' ? import.meta.env.VITE_MPC_HTTP_PMS : window.origin
     )
     signalR = new SignalR(CPM_HUB)
-
     signalR.onMessageReceived(
       NOTIFY_PRJ_OPERATION_RESULT,
       (type: keyof signaRType, res: string) => {
@@ -344,10 +343,8 @@
     )
 
     await signalR.start()
-    // const res = await getLogsApi()
   }
   const clearLogs = async () => {
-    // await clearLogsApi()
     logList.value = []
   }
   //控制器在线
@@ -378,12 +375,9 @@
       time: currentTime(),
       event: name + ' : 正在加载...',
     })
-    //重新加载页面
-    // await getPrjs(Number(status.value))
   }
   //卸载节点
   const onUnLoadNode = async ({ name, type, fileURL, state }: any) => {
-    // getPrjs(status.value)
     await unloadPrjApi({
       name,
       type,

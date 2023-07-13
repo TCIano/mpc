@@ -7,3 +7,11 @@ declare module '*.vue' {
   export default component
 }
 declare module 'path-browserify'
+
+interface ImportMetaEnv {
+  readonly VITE_MPC_HTTP_PMS: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}

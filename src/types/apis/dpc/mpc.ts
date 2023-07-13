@@ -200,6 +200,12 @@ export interface signalROnlineDatasChanged {
     }
   }
 }
+
+export interface onlineParamModelType {
+  curK: string
+  lowLimit: string
+  hiLimit: string
+}
 /**
  * 变量颜色
  */

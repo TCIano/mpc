@@ -16,11 +16,11 @@
               class="editable-cell-input-wrapper"
             >
               <a-input
-                ref="inputRef"
                 v-click-outside
                 v-show="column.key === 'tagName'"
                 v-model:value="editData[record.id].tagName"
                 class="ml-5"
+                @pressEnter="saveCellValue(record)"
                 @blur="onBlur"
               ></a-input>
               <check-outlined class="editable-cell-icon-check" @mousedown="saveCellValue(record)" />
@@ -55,15 +55,10 @@
                 v-if="editData[record.id] && editData.dataIndex === column.key"
                 class="editable-cell-input-wrapper"
               >
-                <a-textarea
-                  v-show="column.key === 'desc'"
-                  v-model:value="editData[record.id].desc"
-                  class="ml-5"
-                ></a-textarea>
                 <a-select
                   autofocus
                   defaultOpen
-                  v-show="column.key === 'policy'"
+                  v-if="column.key === 'policy'"
                   v-model:value="editData[record.id].policy"
                   class="w-full"
                   @blur="onCancleSelect"
@@ -96,13 +91,14 @@
                 </a-select>
                 <a-input
                   v-click-outside
-                  v-if="column.key === 'value' && !record.isEnumValueType"
+                  v-show="column.key === 'value' && !record.isEnumValueType"
                   v-model:value="editData[record.id].value"
-                  @blur="onBlur"
+                  @pressEnter="saveCellValue(record)"
+                  @blur.prevent="onBlur"
                 />
                 <check-outlined
                   class="editable-cell-icon-check"
-                  @mousedown="saveCellValue(record)"
+                  @mousedown.prevent="saveCellValue(record)"
                 />
               </div>
               <div
@@ -198,6 +194,8 @@
   )
   const inputRef = ref<HTMLElement>()
   const onBlur = (e: MouseEvent) => {
+    console.log('input')
+
     editData.value = {}
   }
 
@@ -219,6 +217,7 @@
     editData.value.dataIndex = dataIndex
   }
   const onCancleSelect = () => {
+    console.log('select')
     editData.value = {}
   }
   const onDrop = (open: boolean, record: any, old: any) => {
@@ -228,7 +227,6 @@
   //保存单元格
   const saveCellValue = async (col: any) => {
     console.log(12)
-
     const prjName = route.query.name as any
     const option = editData.value[col.id]
     await setParamValueApi(

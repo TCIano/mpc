@@ -24,7 +24,7 @@
             ></a-input>
             <check-outlined
               class="editable-cell-icon-check"
-              @click="saveCellValue(index, column.key)"
+              @mousedown="saveCellValue(index, column.key)"
             />
           </div>
           <div
@@ -59,7 +59,7 @@
           >
             <a-input-number
               v-click-outside
-              v-show="column.key === 'curK'"
+              v-if="column.key === 'curK'"
               v-model:value="editData[index].curK"
               class="ml-5"
               @blur="editData = {}"
@@ -67,7 +67,7 @@
             ></a-input-number>
             <a-input-number
               v-click-outside
-              v-show="column.key === 'lowLimit'"
+              v-if="column.key === 'lowLimit'"
               v-model:value.number="editData[index].lowLimit"
               class="ml-5"
               @pressEnter="saveCellValue(index, column.key)"
@@ -75,7 +75,7 @@
             ></a-input-number>
             <a-input-number
               v-click-outside
-              v-show="column.key === 'hiLimit'"
+              v-if="column.key === 'hiLimit'"
               v-model:value.number="editData[index].hiLimit"
               class="ml-5"
               @pressEnter="saveCellValue(index, column.key)"
@@ -84,7 +84,7 @@
             <a-select
               autofocus
               defaultOpen
-              v-show="column.key === 'policy'"
+              v-if="column.key === 'policy'"
               v-model:value="editData[index].policy"
               class="w-full"
               @blur="onCancleSelect"
@@ -119,6 +119,7 @@
   import { useTableColumn } from '@/hooks/table'
   import { useRoute } from 'vue-router'
   import { cloneDeep } from 'lodash-es'
+  import { onlineParamModelType } from '@/types/apis/dpc/mpc'
   import { setModelInfoValueApi } from '@/api/modules'
   import { message } from 'ant-design-vue'
   const route = useRoute()
@@ -181,9 +182,15 @@
       width: 150,
     }
   )
+
+  const onlineParamType: onlineParamModelType = {
+    curK: 'K',
+    lowLimit: 'L',
+    hiLimit: 'H',
+  }
   const editData: UnwrapRef<Record<string | number, any>> = ref({})
   const policyStartWith = computed(() => {
-    return (record: any) => record.policy.startsWith('位号')
+    return (record: any) => record.policy.startsWith('位号') && !props.type
   })
   const getIsEnumValueTypeTitle = computed(() => {
     return (record: any, text: string) => {
@@ -209,6 +216,8 @@
   }
   //保存单元格
   const saveCellValue = async (key: string, param: string) => {
+    console.log(param)
+
     //判断当前增益和增益上下限匹配问题
     const { curK, inputName, outputName, policy, hiLimit, lowLimit, tagName } = editData.value[key]
     const isPass = curK >= lowLimit && curK <= hiLimit && lowLimit < hiLimit
@@ -220,7 +229,7 @@
       ? {
           prjName,
           value: editData.value[key][param],
-          paramType: param,
+          paramType: onlineParamType[param as keyof onlineParamModelType],
         }
       : {
           policy,

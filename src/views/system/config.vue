@@ -1,19 +1,4 @@
 <template>
-  <!-- <tree-menu-layout :hasLeft="false"> -->
-  <!-- <template #centerContent> -->
-  <!-- <a-form>
-        <a-form-item label="平台名称">
-          <a-input
-            v-model:value="state.projectName"
-            size="small"
-            @pressEnter="onPrjNameUpdate"
-            @blur="onPrjNameUpdate"
-          />
-        </a-form-item>
-      </a-form> -->
-
-  <!-- </template> -->
-  <!-- </tree-menu-layout> -->
   <div>
     <table-header>
       <template #top-left>
