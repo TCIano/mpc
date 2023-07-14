@@ -1,14 +1,6 @@
 import * as echarts from 'echarts/core'
-
-import {
-  BarChart,
-  LineChart,
-  PieChart,
-  RadarChart,
-  BarSeriesOption,
-  LineSeriesOption,
-  RadarSeriesOption,
-} from 'echarts/charts'
+//按需引入
+import { BarChart, LineChart, PieChart, RadarChart } from 'echarts/charts'
 
 import { CanvasRenderer } from 'echarts/renderers'
 
@@ -17,7 +9,7 @@ import {
   TooltipComponent,
   GridComponent,
   LegendComponent,
-  TitleComponentOption,
+  MarkLineComponent,
 } from 'echarts/components'
 
 echarts.use([
@@ -30,6 +22,7 @@ echarts.use([
   GridComponent,
   TitleComponent,
   LegendComponent,
+  MarkLineComponent,
 ])
 
 export default echarts

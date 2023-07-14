@@ -152,22 +152,27 @@
         let option = {
           title: {
             text: isHasOccupy.fullName,
+            textStyle: {
+              fontSize: 15,
+            },
           },
           tooltip: {
             trigger: 'axis',
           },
-          legend: {
-            top: '10%',
-            data: isHasOccupy.lines?.map((item: any) => item.name),
-          },
           grid: {
-            top: '25%',
+            top: '15%',
             bottom: '10%',
+            left: '7%',
+            right: '5%',
+          },
+          legend: {
+            top: '5%',
+            data: isHasOccupy.lines?.map((item: any) => item.name),
           },
           xAxis: {
             type: 'time',
             axisLabel: {
-              formatter: '{HH}:{mm}:{ss}',
+              rotate: 20,
             },
           },
           yAxis: {
@@ -181,11 +186,15 @@
               symbol: 'none',
               smooth: true,
               markLine: {
-                data: [{ xAxis: isHasOccupy.baseTime }],
+                label: {
+                  fontSize: 10,
+                },
+                data: [{ xAxis: isHasOccupy.baseTime }, { xAxis: isHasOccupy.baseTime }],
                 lineStyle: {
-                  color: '#999',
+                  color: '#FF0000',
                   type: 'dashed',
                 },
+                symbol: 'none',
               },
               lineStyle: {
                 type: item.isDashBrush ? 'dashed' : 'solid',
@@ -343,22 +352,27 @@
     let o = {
       title: {
         text: currentData.fullName,
+        textStyle: {
+          fontSize: 15,
+        },
       },
       tooltip: {
         trigger: 'axis',
       },
       legend: {
-        top: '10%',
+        top: '5%',
         data: currentData.lines?.map((item) => item.name),
       },
       grid: {
-        top: '25%',
+        top: '15%',
         bottom: '10%',
+        left: '7%',
+        right: '5%',
       },
       xAxis: {
         type: 'time',
         axisLabel: {
-          // formatter: '{mm}:{ss}',
+          rotate: 20,
         },
       },
       yAxis: {
@@ -378,13 +392,7 @@
           itemStyle: {
             color: 'rgba' + item.color,
           },
-          // markLine: {
-          //   data: [{ xAxis: dayjs().format('YYYY-MM-DD HH:mm:ss') }],
-          //   lineStyle: {
-          //     color: '#999',
-          //     type: 'dashed',
-          //   },
-          // },
+
           smooth: true,
         }
       }),
