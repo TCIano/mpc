@@ -61,7 +61,7 @@
   let echartInstance: any = null
   let timer: any = null
   const init = () => {
-    //高度超过60才生成实例，小于60像素其实看到不到东西浪费性能
+    //高度超过60才生成实
     echartInstance = useEcharts(comChart.value as HTMLDivElement)
     echartInstance.on('finished', () => {
       spinning.value = false

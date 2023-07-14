@@ -215,3 +215,11 @@ export const varColor: { [key: string]: string } = {
   OFF: '#fa5252',
   other: '#228be6',
 }
+
+export interface MOrdVarType {
+  name: string
+}
+export interface CVarVarType {
+  name: string
+  integralFlag: number
+}
