@@ -15,17 +15,24 @@
           </template>
           导出
         </a-button>
-        <!-- <a-button type="dash" size="small" @click="onSaveCtr">
-          <template #icon>
-            <save-outlined />
-          </template>
-          保存
-        </a-button> -->
-        <!-- <delete-button name="批量删除"> </delete-button> -->
+      </template>
+      <template #top-right>
+        <a-input
+          placeholder="请输入名称"
+          size="small"
+          style="width: 150px"
+          v-model:value="fuzzySearch"
+        />
+        <a-button type="primary" size="small" @click="setSearch">
+          <template #icon><SearchOutlined /></template>
+          搜索
+        </a-button>
+        <a-button size="small" @click="resetSearch"> 重置 </a-button>
       </template>
     </table-header>
     <table-body>
       <a-table
+        size="middle"
         :columns="colums"
         :pagination="pagination"
         :loading="tableLoading"
@@ -371,14 +378,7 @@
     createByManualApi,
   } from '@/api/modules'
   import { MpcPrjsRes } from '@/types/apis/dpc/mpc'
-  import {
-    FormInstance,
-    Modal,
-    UploadChangeParam,
-    UploadProps,
-    message,
-    Empty,
-  } from 'ant-design-vue'
+  import { FormInstance, UploadProps, message, Empty } from 'ant-design-vue'
   import { useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
   import { encode } from 'querystring'
   import dayjs from 'dayjs'
@@ -580,6 +580,7 @@
   })
 
   const searchInput = ref()
+  const fuzzySearch = ref<string>('')
   const handleSearch = (selectedKeys: string[], confirm: Function, dataIndex: string) => {
     confirm()
     state.searchText = selectedKeys[0]
@@ -589,6 +590,19 @@
   const handleReset = (clearFilters: Function) => {
     clearFilters({ confirm: true })
     state.searchText = ''
+  }
+  //顶部查询
+  const resetSearch = () => {
+    getPrjs()
+    fuzzySearch.value = ''
+  }
+  const setSearch = () => {
+    const res = dataList.filter((item) => {
+      return item.name.toLowerCase().includes(fuzzySearch.value.toLowerCase())
+    })
+    console.log(fuzzySearch.value)
+
+    handleSuccess(res)
   }
   const reg = new RegExp(`(?<=${state.searchText})|(?=${state.searchText})`, 'i')
 

@@ -40,7 +40,6 @@ export const clickOutside: Directive = {
         el.getElementsByTagName('input')[0].select()
       }
     }
-
     nodeList = {
       documentHandler: createDocumentHandler(el, binding),
     }

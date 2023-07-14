@@ -72,12 +72,7 @@
           </a-space>
         </template>
         <template #icon="{ data }">
-          <template v-if="data.type === 'node'">
-            <folder-open-outlined />
-          </template>
-          <template v-else>
-            <file-markdown-outlined />
-          </template>
+          <component :is="nodeIconMap[data.type as NodeType]" />
         </template>
       </a-tree>
     </div>
@@ -114,7 +109,7 @@
     computed,
     watch,
   } from 'vue'
-  import { TreeNodes, Prjs, NodeType } from '@/types/apis/ctr/nodes'
+  import { TreeNodes, Prjs, NodeType, nodeIconMap } from '@/types/apis/ctr/nodes'
   import { FormInstance, TreeProps, message } from 'ant-design-vue'
   import type { AntTreeNodeDragEnterEvent, AntTreeNodeDropEvent } from 'ant-design-vue/es/tree'
   import { AntTreeNodeSelectedEvent, DataNode } from 'ant-design-vue/lib/tree'
@@ -125,9 +120,10 @@
     deleteNodeApi,
     getPrjNodeTreeApi,
     updateNodeApi,
+    RemoveNodeApi,
   } from '@/api/modules/ctr/nodes'
-  import { RemoveNodeApi } from '@/api/modules/ctr/nodes'
   import { cloneDeep } from 'lodash-es'
+
   const formRef = ref<FormInstance>()
   const selectTreeNode = ref<TreeProps['selectedKeys']>()
   const drawerDialog = ref<DrawerDialogType>()

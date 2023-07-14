@@ -1,10 +1,13 @@
 import { MessageApi } from 'ant-design-vue/lib/message'
 import { Ref, VNode } from 'vue'
+import * as Icons from '@ant-design/icons-vue/lib/icons'
 
 export interface HeaderCellStyle {
   backgroundColor?: string
   color: string
 }
+//icon类型提示
+export type IconNameType = keyof typeof Icons
 
 export interface TableConfig {
   dataList: Array<any>

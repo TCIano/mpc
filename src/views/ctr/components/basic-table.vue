@@ -151,7 +151,6 @@
       tableColumn: () => [],
     }
   )
-
   const columns = useTableColumn(
     [
       {

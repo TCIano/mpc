@@ -1,3 +1,4 @@
+import { IconNameType } from '@/types/components'
 export interface NodeId {
   nodeId: string
 }
@@ -33,4 +34,10 @@ export interface TreeNodes {
   type: NodeType
   children?: TreeNodes[]
   prjs?: Prjs[]
+}
+//图标类型
+export const nodeIconMap: Record<NodeType, IconNameType> = {
+  node: 'FolderOpenOutlined',
+  mpc: 'FileMarkdownOutlined',
+  script: 'StrikethroughOutlined',
 }
