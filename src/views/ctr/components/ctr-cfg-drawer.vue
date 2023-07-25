@@ -25,7 +25,7 @@
     </a-form-item>
   </a-form>
   <div v-if="modalData.createType" class="p-1 border-2 border-gray-100 shadow-lg">
-    <a-row :gutter="[10]">
+    <a-row :gutter="3">
       <a-col :span="12">
         <a-form-item label="采样周期" name="period" :rules="[{ type: 'number', min: 0 }]">
           <a-input-number style="width: 100%" v-model:value="modalData.period" />

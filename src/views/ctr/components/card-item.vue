@@ -1,5 +1,5 @@
 <template>
-  <a-row :gutter="[10, 10]">
+  <a-row :gutter="[2, 2]">
     <a-col :span="8" :lg="8" :md="12" :sm="24" :xs="10" v-for="item in cardList">
       <a-card class="shadow-md">
         <template #actions>

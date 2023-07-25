@@ -1,73 +1,58 @@
 <template>
-  <a-row :gutter="10">
-    <!-- <a-col :span="4">
-      <a-card class="h-full" :bodyStyle="{ padding: '5px' }" :headerStyle="{ padding: '5px' }">
-        <a-space>
-          <a-input class="mr-2" placeholder="搜索" size="small" />
-          <a-switch size="small" v-model:checked="expandAllFlag" />
-        </a-space>
-        <div class="mt-4">
-          <a-tree v-model:expandedKeys="getExpandedKeys" :tree-data="departmentData" checkable />
-        </div>
-      </a-card>
-    </a-col> -->
-    <a-col :span="24">
-      <div>
-        <TableHeader ref="tableHeaderRef" :show-filter="false">
-          <template #top-left>
-            <add-button @add="onAdditem" />
-            <!-- <DeleteButton @delete="onDeleteItems" /> -->
+  <div>
+    <TableHeader ref="tableHeaderRef" :show-filter="false">
+      <template #top-left>
+        <add-button @add="onAdditem" />
+        <!-- <DeleteButton @delete="onDeleteItems" /> -->
+      </template>
+    </TableHeader>
+    <TableBody>
+      <template #default>
+        <a-table
+          :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+          :loading="tableLoading"
+          :data-source="dataList"
+          :columns="tableColumns"
+          :pagination="true"
+          :customRow="(record:Users, index:number) => useCustomeRowSelect<Users>(record, index, 'id')"
+          tableLayout="fixed"
+          :rowKey="rowKey"
+          :scroll="{ y: tableHeight, x: 'max-content' }"
+        >
+          <template #bodyCell="{ column, record, index }">
+            <template v-if="column.key === 'index'">
+              {{ index + 1 }}
+            </template>
+            <template v-if="column.key === 'gender'">
+              {{ record.gender === 1 ? '男' : '女' }}
+            </template>
+            <template v-if="column.key === 'avatar'">
+              <a-avatar>{{ record.nickName.substring(0, 1) }}</a-avatar>
+            </template>
+            <template v-if="column.key === 'actions'">
+              <a-space>
+                <a-button ghost type="primary" @click="onEditItem(record)" size="small"
+                  >编辑</a-button
+                >
+                <a-popconfirm
+                  title="是否要删除此数据?"
+                  ok-text="是"
+                  cancel-text="否"
+                  @confirm="onDeleteItem(record)"
+                >
+                  <a-button danger size="small">删除</a-button>
+                </a-popconfirm>
+              </a-space>
+            </template>
+            <template v-if="column.key === 'status'">
+              <a-tag color="success" size="small" v-if="record.status === 1">正常</a-tag>
+              <a-tag color="error" size="small" v-else>禁用</a-tag>
+            </template>
           </template>
-        </TableHeader>
-        <TableBody>
-          <template #default>
-            <a-table
-              :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-              :loading="tableLoading"
-              :data-source="dataList"
-              :columns="tableColumns"
-              :pagination="true"
-              :customRow="(record:Users, index:number) => useCustomeRowSelect<Users>(record, index, 'id')"
-              tableLayout="fixed"
-              :rowKey="rowKey"
-              :scroll="{ y: tableHeight, x: 'max-content' }"
-            >
-              <template #bodyCell="{ column, record, index }">
-                <template v-if="column.key === 'index'">
-                  {{ index + 1 }}
-                </template>
-                <template v-if="column.key === 'gender'">
-                  {{ record.gender === 1 ? '男' : '女' }}
-                </template>
-                <template v-if="column.key === 'avatar'">
-                  <a-avatar>{{ record.nickName.substring(0, 1) }}</a-avatar>
-                </template>
-                <template v-if="column.key === 'actions'">
-                  <a-space>
-                    <a-button ghost type="primary" @click="onEditItem(record)" size="small"
-                      >编辑</a-button
-                    >
-                    <a-popconfirm
-                      title="是否要删除此数据?"
-                      ok-text="是"
-                      cancel-text="否"
-                      @confirm="onDeleteItem(record)"
-                    >
-                      <a-button danger size="small">删除</a-button>
-                    </a-popconfirm>
-                  </a-space>
-                </template>
-                <template v-if="column.key === 'status'">
-                  <a-tag color="success" size="small" v-if="record.status === 1">正常</a-tag>
-                  <a-tag color="error" size="small" v-else>禁用</a-tag>
-                </template>
-              </template>
-            </a-table>
-          </template>
-        </TableBody>
-        <!-- <TableFooter ref="tableFooterRef" :pagination="pagination" /> -->
-      </div>
-    </a-col>
+        </a-table>
+      </template>
+    </TableBody>
+    <!-- <TableFooter ref="tableFooterRef" :pagination="pagination" /> -->
     <DrawerDialog
       ref="userEditModal"
       :title="actionModal === 'add' ? '添加用户' : '编辑用户'"
@@ -105,7 +90,7 @@
         </a-form>
       </template>
     </DrawerDialog>
-  </a-row>
+  </div>
 </template>
 
 <script lang="ts">

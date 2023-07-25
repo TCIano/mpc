@@ -37,7 +37,7 @@
                 :pagination="true"
                 :bordered="true"
                 :rowKey="rowKey"
-                :scroll="{ y: tableHeight - 290, x: 930 }"
+                :scroll="{ y: tableHeight - 250, x: 930 }"
               >
                 <template #bodyCell="{ column, record, index }">
                   <template v-if="column.key === 'name'">
@@ -422,6 +422,8 @@
   onMounted(async () => {
     treeHeight.value = document.querySelector('.main-section')?.getBoundingClientRect().height
     tableHeight.value = (await useTableHeight(getCurrentInstance())) as number
+    console.log(tableHeight.value)
+
     getPrjs(5)
     getLogs()
   })

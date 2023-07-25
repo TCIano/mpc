@@ -34,7 +34,7 @@
           :model="formData"
           name="form"
         >
-          <a-row :gutter="[5, 10]">
+          <a-row :gutter="[2, 2]">
             <a-col :span="12">
               <div class="p-2 pt-3 pb-0 border-2 model-info">
                 <a-form-item label="输入变量" name="inputName">

@@ -32,7 +32,7 @@
         </a-menu>
       </template>
       <template #centerContent>
-        <a-row :gutter="[10, 5]">
+        <a-row :gutter="[2, 2]">
           <div class="w-full pb-2 border-b-2 h-1/5 treeMenu-optionRow">
             <a-space>
               <a-button type="primary" size="small" @click="onSaveCtr">
@@ -80,7 +80,7 @@
             </a-space>
           </div>
         </a-row>
-        <a-row :gutter="[10, 5]">
+        <a-row :gutter="[2, 2]">
           <div class="w-full h-4/5">
             <suspense>
               <template #default>

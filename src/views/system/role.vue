@@ -1,6 +1,6 @@
 <template>
   <div class="main-container">
-    <TableHeader :show-filter="false">
+    <TableHeader ref="tableHeaderRef" :show-filter="false">
       <template #top-right>
         <AddButton @add="onAddItem" />
       </template>

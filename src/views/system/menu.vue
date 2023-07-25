@@ -14,6 +14,7 @@
           :columns="tableColumns"
           :pagination="false"
           bordered
+          expandRowByClick
         >
           <template #bodyCell="{ column, record, index, text }">
             <template v-if="column.key === 'index'">

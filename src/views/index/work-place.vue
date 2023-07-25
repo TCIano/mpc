@@ -8,18 +8,18 @@
     >
       <a-row class="margin-top" wrap>
         <a-col :xs="24" :sm="16" :md="16" :lg="16" :xl="14">
-          <div class="flex justify-center items-center">
+          <div class="flex items-center justify-center">
             <div class="avatar-wrapper">
               <img :src="avatar" />
             </div>
             <div class="flex flex-col justify-around ml-3.5 flex-1">
               <div class="text-lg">早上好，Andy，青春只有一次，别让自己过得不精彩</div>
-              <div class="text-sm text-gray-500 mt-2"> 今日有小雨，出门别忘记带伞哦~ </div>
+              <div class="mt-2 text-sm text-gray-500"> 今日有小雨，出门别忘记带伞哦~ </div>
             </div>
           </div>
         </a-col>
         <a-col :xs="24" :sm="8" :md="8" :lg="8" :xl="10">
-          <div class="flex justify-end items-center h-full w-full mt-4">
+          <div class="flex items-center justify-end w-full h-full mt-4">
             <div class="flex flex-col justify-around align-end item-action">
               <div class="text-gray">项目数</div>
               <div class="text-xl">12</div>
@@ -36,7 +36,7 @@
         </a-col>
       </a-row>
     </a-card>
-    <a-row class="mt-2 mb-2" :gutter="[10, 10]">
+    <a-row class="mt-2 mb-2" :gutter="[2, 2]">
       <a-col
         :xs="12"
         :sm="8"
@@ -62,7 +62,7 @@
         </a-card>
       </a-col>
     </a-row>
-    <a-row class="mt-1" :gutter="10">
+    <a-row class="mt-1" :gutter="2">
       <a-col :xs="24" :sm="24" :md="24" :lg="16" :xl="16">
         <div>
           <a-card

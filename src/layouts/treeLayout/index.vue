@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-row :gutter="10">
+    <a-row :gutter="2">
       <a-col :span="6">
         <a-card
           :title="props.titleL"

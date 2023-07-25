@@ -11,7 +11,6 @@
   import { defineComponent } from 'vue'
   import { useLayoutStore } from '../index'
   import { getAssetsHomeFile } from '@/utils/utils'
-  // import { projectName } from '../../setting'
   export default defineComponent({
     name: 'Logo',
     props: {
@@ -33,7 +32,6 @@
       const importImg = getAssetsHomeFile(store.state.projectLogo)
       return {
         state: store?.state,
-        // projectName,
         importImg,
       }
     },
@@ -47,12 +45,12 @@
     align-items: center;
     border-bottom: 1px dashed var(--border-color);
     .logo-img {
-      width: calc(@menuWidth / 3);
+      width: calc(@menuWidth / 2);
     }
     .logo-title {
-      margin-left: 10px;
-      font-size: 20px;
-      font-weight: bold;
+      margin-left: 15px;
+      font-size: 25px;
+      color: #595959;
     }
     .show-title {
       transform: scale(1);

@@ -8,11 +8,10 @@
     </table-header>
     <table-body>
       <template #default>
-        <a-row :gutter="5">
+        <a-row :gutter="1">
           <a-col :span="12">
             <a-table
               :loading="tableLoading"
-              :pagination="false"
               :data-source="dataList"
               :columns="columns"
               :row-key="rowKey"
@@ -34,15 +33,24 @@
             </a-table>
           </a-col>
           <a-col :span="12">
-            <codemirror
+            <!-- <codemirror
               v-model="code"
               placeholder="请选择脚本或直接编写.."
-              :style="{ height: codeHeigth + 'px' }"
+              :extensions="exti"
               :autofocus="true"
               :indent-with-tab="true"
               :tab-size="2"
-              :extensions="extensions"
-              @ready="handleReady"
+            /> -->
+            <code-editor
+              v-model:modelValue="code"
+              :options="{
+                disabled,
+                placeholder: '请选择脚本或直接编写..',
+                autofocus: true,
+                indentWithTab: true,
+                tabSize: '2',
+              }"
+              :codeHeigth="codeHeigth || 300"
             />
           </a-col>
         </a-row>
@@ -62,9 +70,7 @@
 
 <script lang="ts">
   import { defineComponent, ref, watch, shallowRef, onMounted, getCurrentInstance } from 'vue'
-  import { Codemirror } from 'vue-codemirror'
-  import { python } from '@codemirror/lang-python'
-  import { oneDark } from '@codemirror/theme-one-dark'
+
   import {
     useTableHeight,
     useTable,
@@ -85,21 +91,18 @@
   import { FormInstance, message } from 'ant-design-vue'
   import { base642String, string2Base64 } from '@/utils/utils'
   export default defineComponent({
-    components: {
-      Codemirror,
-    },
     setup() {
       const table = useTable()
       const { selectedRowKeys, onSelectChange, rowSelectType } = useRowSelection('radio') //规定单多选
       rowSelectType.value = 'radio'
       const code = ref<string | undefined>(``)
-      const extensions = [python(), oneDark]
-      const view = shallowRef()
+      const disabled = ref<boolean>(false)
       const codeHeigth = ref()
       const scriptDra = ref<DrawerDialogType>()
       const formData = ref<any>({
         name: '',
       })
+
       const rowKey = useRowKey('name')
       const form = ref<FormInstance>()
       const columns = useTableColumn(
@@ -135,18 +138,7 @@
           code.value = ''
         }
       }
-      const handleReady = (payload: any) => {
-        view.value = payload.view
-      }
 
-      const getCodemirrorStates = () => {
-        const state = view.value.state
-        const ranges = state.selection.ranges
-        const selected = ranges.reduce((r: any, range: any) => r + range.to - range.from, 0)
-        const cursor = ranges[0].anchor
-        const length = state.doc.length
-        const lines = state.doc.lines
-      }
       const doRefresh = async () => {
         const res: ScriptItem[] = await getAllScriptApi()
         table.handleSuccess(res)
@@ -175,15 +167,15 @@
       }
       onMounted(async () => {
         table.tableHeight.value = (await useTableHeight(getCurrentInstance())) as number
+        // 32 分页大小
         codeHeigth.value =
           table.tableHeight.value +
+            32 +
             document.querySelector('.ant-table-header')?.getBoundingClientRect()?.height! || 0
         doRefresh()
       })
       return {
         code,
-        extensions,
-        handleReady,
         log: console.log,
         codeHeigth,
         onAddItem,
@@ -200,6 +192,7 @@
         onSelectChange,
         rowKey,
         rowSelectType,
+        disabled,
       }
     },
   })

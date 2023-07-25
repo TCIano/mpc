@@ -158,6 +158,7 @@
     }
     .main-section {
       min-height: calc(100% - 10px - @footerHeight);
+      // overflow-x: hidden;
       overflow-x: auto;
     }
     .main-section__overflow-y {

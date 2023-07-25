@@ -29,7 +29,8 @@ export const useTableHeight = async function (currentIns: any, otherClass?: any)
         document.querySelector('.main-section')?.getBoundingClientRect().height || 0
       const tableHeaderHeight =
         document.querySelector('.ant-table-header')?.getBoundingClientRect().height || 0
-      const tableFooterHeight = 56 //antd分页大小
+
+      const tableFooterHeight = 32 //antd分页大小
       // document.querySelector('.ant-pagination')?.getBoundingClientRect().height || 0
       const otherClassHeight =
         document.querySelector(otherClass)?.getBoundingClientRect().height || 0
@@ -44,7 +45,7 @@ export const useTableHeight = async function (currentIns: any, otherClass?: any)
         if (currentIns.refs.tableFooterRef) {
           tempHeight += (currentIns.refs as any).tableFooterRef.$el.clientHeight
         } else {
-          // tempHeight += tableFooterHeight
+          tempHeight += tableFooterHeight
           // tempHeight -= 45
         }
         resolve(clientHeight - tempHeight)
