@@ -318,7 +318,7 @@
   //修改节点状态
   function updateNodeValue(node: any, name: string, newValue: number, prop: string) {
     if (node.name === name) {
-      node[prop] = newValue
+      return (node[prop] = newValue)
     }
     if (node.children) {
       node.children.forEach((child: any) => updateNodeValue(child, name, newValue, prop))

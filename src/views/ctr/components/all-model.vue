@@ -90,10 +90,6 @@
     lowLimit: number
     datas: number[]
   }
-  //   const props = defineProps<{
-
-  //     models: Model[]
-  //   }>()
   const chart = ref<any>()
   const mpcStore = useMpcStore()
   let models = ref<TreeNode[]>([])

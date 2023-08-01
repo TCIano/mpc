@@ -1,16 +1,9 @@
 import { SETTING_INFO_KEY } from '@/layouts/setting/keys'
-import useUserStore from '@/store/modules/user'
-import pinia from '@/store/pinia'
-
-const userStore = useUserStore(pinia)
-
-const { systemCfg } = await userStore.reloadCfg()
-
-const settingInfo = JSON.parse(
-  localStorage.getItem(SETTING_INFO_KEY) || JSON.stringify(systemCfg) || '{}'
-) as Setting
-export const projectName = settingInfo.projectName
-interface Setting {
+import { cfgLogoKey } from '@/enum/setting'
+const settingInfo = JSON.parse(localStorage.getItem(SETTING_INFO_KEY) || '{}') as Setting
+export const projectName = settingInfo.projectName || ''
+export interface Setting {
+  home: string
   projectName: string
   theme: 'light' | 'dark'
   sideTheme: 'dark' | 'white' | 'image'
@@ -34,6 +27,7 @@ interface Setting {
 export default Object.assign(
   {
     theme: 'light',
+    home: '',
     sideTheme: 'dark',
     themeColor: 'cyan@#18a058',
     layoutMode: 'ltr',
@@ -45,7 +39,7 @@ export default Object.assign(
     waterMark: projectName,
     projectName: '',
     isGray: false,
-    projectLogo: 'logo',
+    [cfgLogoKey]: 'logo',
     actionBar: {
       isShowSearch: false,
       isShowMessage: false,

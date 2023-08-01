@@ -54,7 +54,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-left: 12px;
+      margin-left: 5px;
       // width: calc(@menuWidth / 2);
     }
     .menu-wrapper {

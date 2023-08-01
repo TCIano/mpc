@@ -1,4 +1,4 @@
-import { SideTheme, RouteRecordRawWithHidden } from './../types/store'
+import { SideTheme, RouteRecordRawWithHidden, StoreType } from './../types/store'
 import { reactive } from 'vue'
 import { DeviceType, LayoutMode, StateType, ThemeMode } from '../types/store'
 import { transfromRoutes } from '../utils'
@@ -10,6 +10,10 @@ import { useChangeMenuWidth } from '../hooks/useMenuWidth'
 import useGray from '../hooks/useGray'
 import useTheme from '../hooks/useTheme'
 import { SETTING_INFO_KEY } from '@/layouts/setting/keys'
+import { supportedCfgs, cfgLogoKey } from '@/enum/setting'
+import { getImageByName, getPlfCfgListbyNameApi } from '@/api/modules'
+import { obj2KeyValueByQuery } from '@/utils/utils'
+import { CfgFormData } from '@/types/apis/user'
 
 export function presistSettingInfo(setting: any) {
   localStorage.setItem(SETTING_INFO_KEY, JSON.stringify(setting))
@@ -23,6 +27,7 @@ const originState = {
   layoutMode: Setting.layoutMode,
   device: DeviceType.PC,
   theme: Setting.theme,
+  home: Setting.home,
   sideBarBgColor: Setting.sideTheme,
   pageAnim: Setting.pageAnim,
   waterMark: Setting.waterMark,
@@ -42,8 +47,12 @@ const originState = {
 
 const store = {
   state: reactive<StateType>(originState),
-  start({ state, actions }: any): void {
-    state && (this.state = Object.assign(this.state, state))
+  async start({ state, actions }: any): Promise<void> {
+    //可以在这获取用户可配置项api
+    const cfgObj = await getPlfCfgListbyNameApi(supportedCfgs)
+    const supportedCfgObj = obj2KeyValueByQuery<CfgFormData>(cfgObj)
+    const finalState = { ...state, ...supportedCfgObj } //最终配置（包括默认配置和后台配置）
+    state && (this.state = Object.assign(this.state, finalState))
     if (actions) {
       for (const key in actions) {
         ;(this as any)[key] = actions[key]
@@ -68,11 +77,20 @@ const store = {
   toggleCollapse(newStatus: boolean) {
     this.state.isCollapse = newStatus
   },
-  changePrjName(newStatus: string) {
+  changeProjectName(newStatus: string) {
     this.state.projectName = newStatus
     presistSettingInfo(
       Object.assign(Setting, {
         projectName: newStatus,
+      })
+    )
+  },
+  //修改首页
+  changeHome(newHome: string) {
+    this.state.home = newHome
+    presistSettingInfo(
+      Object.assign(Setting, {
+        home: newHome,
       })
     )
   },
@@ -106,6 +124,12 @@ const store = {
       })
     )
   },
+  //获取页面log
+  // getProjectLogo() {
+  //   return getImageByName(cfgLogoKey)
+  // },
+  //修稿页面logo
+
   changePageAnim(pageAnim: string) {
     this.state.pageAnim = pageAnim
     presistSettingInfo(
@@ -137,6 +161,7 @@ const store = {
       layoutMode: Setting.layoutMode,
       device: DeviceType.PC,
       theme: Setting.theme,
+      home: Setting.home,
       sideBarBgColor: Setting.sideTheme,
       pageAnim: Setting.pageAnim,
       waterMark: Setting.waterMark,
@@ -157,6 +182,6 @@ const store = {
   },
   ...CachedViewAction,
   ...VisitedViewAction,
-}
+} as StoreType
 
 export default store

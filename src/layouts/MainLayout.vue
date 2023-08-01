@@ -51,7 +51,7 @@
   import { useLayoutStore } from './index'
   import store from '@/store'
   import { useTitle } from '@vueuse/core'
-  import { projectName } from '@/setting'
+  // import { projectName } from '@/setting'
   export default defineComponent({
     name: 'MainLayout',
     props: {
@@ -70,7 +70,8 @@
       })
       const router = useRouter()
       const route = useRoute()
-      const title = useTitle(projectName + ' | ' + (route.meta.title as string))
+      const projectName = store.state.projectName
+      useTitle(projectName + ' | ' + (route.meta.title as string))
       onMounted(() => {
         listenTo1.value = () => document.querySelector('.main-base-style')
         listenTo2.value = () => document.querySelector('.vaw-main-layout-container')

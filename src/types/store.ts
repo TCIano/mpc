@@ -54,6 +54,7 @@ export enum SideTheme {
 
 export interface StateType {
   isCollapse: boolean
+  home: string
   isFixedNavBar: boolean
   layoutMode: string
   device: DeviceType
@@ -78,7 +79,7 @@ export interface StateType {
 
 export interface StoreType extends CacheView, VisitedView {
   state: UnwrapRef<StateType>
-  start: (params: any) => void
+  start: (params: any) => Promise<void>
   randomLayouMode: () => void
   toggleCollapse: (newStatus: boolean) => void
   toggleFixedNavBar: (newStatus: boolean) => void
@@ -87,10 +88,12 @@ export interface StoreType extends CacheView, VisitedView {
   changeTheme: (theme: ThemeMode) => void
   changeSideBarBgColor: (colorName: SideTheme) => void
   changePageAnim: (pageAnim: string) => void
-  changePrjName: (prjName: string) => void
+  changeHome: (home: string) => void
+  changeProjectName: (prjName: string) => void
   changeProjectLogo: (prjLogo: string) => void
   changePrimaryColor: (color: string) => void
   isShowHeader: () => boolean
+  getProjectLogo: () => string
   getSplitTabs: () => Array<RouteRecordRawWithHidden>
   initPermissionRoute: (routes: Array<RouteRecordRaw>) => void
   isEmptyPermissionRoute: () => boolean

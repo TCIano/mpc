@@ -5,10 +5,11 @@ import OptimizationPersist from 'vite-plugin-optimize-persist'
 import PkgConfig from 'vite-plugin-package-config'
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
 import path from 'path'
-import { ConfigEnv, defineConfig, loadEnv } from 'vite'
+import { ConfigEnv, defineConfig, loadEnv, type PluginOption } from 'vite'
 import dotenv from 'dotenv'
 import vueSetupExtend from 'vite-plugin-vue-setup-extend'
 import topLevelAwait from 'vite-plugin-top-level-await'
+import { visualizer } from 'rollup-plugin-visualizer'
 export default ({ mode }) => {
   const dotenvConfig = dotenv.config({ path: `./.env.${mode}` })
   const dotenvObj = dotenvConfig.parsed
@@ -16,6 +17,19 @@ export default ({ mode }) => {
     base: dotenvObj?.BUILD_PATH,
     build: {
       outDir: dotenvObj?.BUILD_OUT_DIR || 'dist',
+      chunkSizeWarningLimit: 1024,
+      rollupOptions: {
+        output: {
+          chunkFileNames: 'static/js/[name]-[hash].js', // 引入文件名的名称
+          entryFileNames: 'static/js/[name]-[hash].js', // 包的入口文件名称
+          assetFileNames: 'static/[ext]/[name]-[hash].[ext]', // 资源文件像 字体，图片等
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              return id.toString().split('node_modules/')[1].split('/')[0].toString()
+            }
+          },
+        },
+      },
     },
     plugins: [
       vue(),
@@ -34,7 +48,12 @@ export default ({ mode }) => {
         promiseExportName: '__tla',
         promiseImportName: (i) => `__tla_${i}`,
       }),
-    ] as any,
+      visualizer({
+        open: true,
+        emitFile: false,
+        filename: 'visualizer-chart.html',
+      }),
+    ] as PluginOption[],
     css: {
       preprocessorOptions: {
         less: {

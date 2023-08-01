@@ -1,6 +1,6 @@
 <template>
   <div class="logo-wrapper">
-    <img v-if="showLogo" class="logo-img" :src="importImg" />
+    <img v-if="showLogo" class="logo-img" :src="state.projectLogo" />
     <div v-if="showTitle" :class="[!state.isCollapse || alwaysShow ? 'show-title' : 'close-title']">
       <span class="logo-title">{{ state.projectName }}</span>
     </div>
@@ -29,10 +29,9 @@
     },
     setup() {
       const store = useLayoutStore()
-      const importImg = getAssetsHomeFile(store.state.projectLogo)
+
       return {
         state: store?.state,
-        importImg,
       }
     },
   })
@@ -45,7 +44,9 @@
     align-items: center;
     border-bottom: 1px dashed var(--border-color);
     .logo-img {
-      width: calc(@menuWidth / 2);
+      // width: calc(@menuWidth / 2);
+      max-height: 80%;
+      object-fit: contain;
     }
     .logo-title {
       margin-left: 15px;

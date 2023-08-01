@@ -16,7 +16,7 @@
           </a-space>
         </div>
       </template>
-      <RichTextEditor ref="richTextEditor" :height="400" />
+      <!-- <RichTextEditor ref="richTextEditor" :height="400" /> -->
     </a-card>
     <div v-if="htmlContent" class="p-4 mt-4 priview-content" v-html="htmlContent"> </div>
     <div v-if="jsonContent" class="p-4 mt-4 priview-content">

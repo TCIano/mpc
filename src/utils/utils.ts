@@ -2,7 +2,10 @@ import dayjs from 'dayjs'
 import type { TreeProps } from 'ant-design-vue'
 import { DataNode } from 'ant-design-vue/lib/tree'
 import { customRef } from 'vue'
+import { supportedCfgs } from '@/enum/setting'
 import { varColor } from '@/types/apis/dpc/mpc'
+import { SettingKeyType } from '@/types/setting'
+import { getImageByName } from '@/api/modules'
 /**
  * 函数防抖
  * @param fn 被防抖函数
@@ -78,6 +81,7 @@ export const getParentKey = (key: string | number, tree: TreeProps['treeData']):
 
 // 获取assets静态资源
 export const getAssetsHomeFile = (url: string) => {
+  if (url.startsWith('http')) return url
   const path = `../assets/${url}.png`
   const modules = import.meta.globEager('../assets/*')
   return modules[path] ? modules[path].default : ''
@@ -120,4 +124,35 @@ export function string2Base64(str: string) {
 export function base642String(b64: string) {
   const utf8 = window.atob(b64)
   return decodeURIComponent(utf8)
+}
+/**
+ *
+ * @param list 目标的对象
+ * @param keyParam  目标对象中的key值（当作新对象的key）
+ * @param valueParam 目标对象中的key值（当作新对象的value）
+ * @returns object
+ */
+export const obj2KeyValueByQuery = <T extends { value: string; name: string; type: string }>(
+  list: T[],
+  keyParam: keyof T = 'name',
+  valueParam: keyof T = 'value'
+) => {
+  const listObj = list.reduce((obj: any, curr: T) => {
+    //判断配置的值类型
+    if (curr.type === 'image') {
+      obj[curr[keyParam]] = getImageByName(curr[keyParam])
+    } else {
+      obj[curr[keyParam]] = curr[valueParam]
+    }
+    return obj
+  }, {})
+  return listObj
+}
+/**
+ *  判断修改的配置项是否是否有效
+ * @param cfg 配置项key
+ * @returns
+ */
+export const isCurrSupportCfg = (cfg: object) => {
+  return supportedCfgs.includes(Object.keys(cfg)[0] as SettingKeyType)
 }

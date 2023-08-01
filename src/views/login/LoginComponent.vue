@@ -128,6 +128,7 @@
     ArrowLeftOutlined,
     PropertySafetyOutlined,
   } from '@ant-design/icons-vue'
+  import { PageEnum } from '@/enum/page'
 
   import { CfgFormData } from '@/types/apis/user'
   import { useInterval, useIntervalFn } from '@vueuse/core'
@@ -187,7 +188,7 @@
                    * 可以配置首页路径
                    */
                   // path: route.query.redirect ? (route.query.redirect as string) : '/',
-                  path: data.redirectURL ?? '/',
+                  path: data.redirectURL === '' ? '/' : data.redirectURL,
                 })
                 .then(() => {
                   loading.value = false

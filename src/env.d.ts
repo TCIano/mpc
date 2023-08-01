@@ -10,6 +10,7 @@ declare module 'path-browserify'
 
 interface ImportMetaEnv {
   readonly VITE_MPC_HTTP_PMS: string
+  readonly VITE_MPC_IMAGE_URL: string
 }
 
 interface ImportMeta {

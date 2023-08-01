@@ -6,9 +6,10 @@ import { StateType } from '@/types/store'
 import Setting from '@/setting'
 import { CfgFormData } from '@/types/apis/user'
 import { getPlfCfgApi } from '@/api/modules'
-import Avatar from '@/assets/img_avatar.gif'
+import Avatar from '@/assets/img_avatar.jpg'
 import Cookies from 'js-cookie'
 import { USER_INFO_KEY, USER_TOKEN_KEY } from '@/layouts/setting/keys'
+import { obj2KeyValueByQuery } from '@/utils/utils'
 
 const defaultAvatar = Avatar
 
@@ -22,7 +23,6 @@ const useUserStore = defineStore('user', {
       menus: userInfo.menus || [],
       redirectURL: userInfo.redirectURL || '',
       avatar: userInfo.avatar || defaultAvatar,
-      systemCfg: '',
     }
   },
   actions: {
@@ -47,14 +47,12 @@ const useUserStore = defineStore('user', {
         resolve()
       })
     },
-    reloadCfg() {
+    reloadCfg(cfgList?: CfgFormData[]) {
       return new Promise<{ apiCfg: CfgFormData[]; systemCfg: any }>(async (resolve, reject) => {
-        const res: CfgFormData[] = await getPlfCfgApi()
-        this.systemCfg = res.reduce((obj: any, curr) => {
-          obj[curr.name] = curr.value
-          return obj
-        }, {})
-        resolve({ apiCfg: res, systemCfg: this.systemCfg })
+        const res = cfgList ? cfgList : await getPlfCfgApi()
+        //可传递泛型
+        const systemCfg = obj2KeyValueByQuery<CfgFormData>(res)
+        resolve({ apiCfg: res, systemCfg })
       })
     },
     presistSystemCfg(res: StateType) {

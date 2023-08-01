@@ -59,7 +59,7 @@
                 导出变量
               </a-button>
             </div>
-            <div>
+            <div class="script-table_wrapper">
               <a-table
                 bordered
                 :columns="columns"
@@ -154,6 +154,36 @@
     {
       index: 22,
     },
+    {
+      index: 22,
+    },
+    {
+      index: 22,
+    },
+    {
+      index: 22,
+    },
+    {
+      index: 22,
+    },
+    {
+      index: 22,
+    },
+    {
+      index: 22,
+    },
+    {
+      index: 22,
+    },
+    {
+      index: 22,
+    },
+    {
+      index: 22,
+    },
+    {
+      index: 22,
+    },
   ]
   handleSuccess(tableData)
   onMounted(async () => {
@@ -161,14 +191,15 @@
     tableHeight.value = ((await useTableHeight(instance)) + 32) as number
     const formHeight =
       (instance?.refs.scriptFormRef as HTMLElement).getBoundingClientRect().height || 0
-    console.log(tableHeight.value)
     //编辑表格内容高度
     editHeight.value = tableHeight.value - formHeight - 53 - 55
   })
 </script>
 
-<style scoped lang="less">
-  .script-form_wrapper {
+<style scoped lang="css">
+  .script-table_wrapper {
+    /* 减去表头高度 55*/
+    height: v-bind(editHeight ? editHeight + 55: 0 + 'px');
   }
 
   .script-button_wrapper {

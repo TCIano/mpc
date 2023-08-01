@@ -379,8 +379,6 @@
     modalData.value.name = ''
   }
   const onConfirmAdd = async () => {
-    console.log(ctrCom.value)
-
     if (modalData.value.name) {
       if (!modalData.value.createType) {
         //导入模型文件创建

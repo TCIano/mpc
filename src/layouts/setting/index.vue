@@ -256,7 +256,7 @@
         store.changeLayoutMode(item.layoutId)
       }
       function onPrjNameUpdate(e: KeyboardEvent) {
-        store.changePrjName((e.target as HTMLInputElement).value)
+        store.changeProjectName((e.target as HTMLInputElement).value)
       }
       function isOpenWater(val: boolean) {
         store.changeOpenWaterMark(val)

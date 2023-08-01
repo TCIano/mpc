@@ -291,7 +291,6 @@
           } else {
             await updateRolesApi({ id, ...restRoles })
           }
-
           doRefresh()
           modalDialogRef.value?.toggle()
         }
